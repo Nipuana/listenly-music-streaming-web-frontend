@@ -1,6 +1,6 @@
 "use client";
-
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Music, Check, User, Lock } from "lucide-react";
@@ -19,11 +19,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
+  const router = useRouter();
+  const {register,handleSubmit,formState: { errors }} = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
@@ -34,7 +31,7 @@ export default function LoginForm() {
 
   function onSubmit(data: LoginFormValues) {
     // Handle login logic here
-    alert(JSON.stringify(data, null, 2));
+    router.push("/dashboard");
   }
 
   return (
