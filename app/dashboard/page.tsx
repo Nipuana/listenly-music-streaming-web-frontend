@@ -13,25 +13,17 @@ export default function DashboardPage() {
       {/* Sidebar */}
       <aside className="w-64 bg-background p-6 flex flex-col gap-6 border-r border-border">
         <nav className="flex flex-col gap-2">
-          <Link href="/dashboard">
-            <a className="flex items-center gap-3 px-4 py-2 rounded-xl font-semibold text-primary bg-gradient-primary shadow-sm">
-              <BarChart2 className="w-5 h-5" /> Dashboard
-            </a>
+          <Link href="/dashboard" className="flex items-center gap-3 px-4 py-2 rounded-xl font-semibold text-primary bg-gradient-primary shadow-sm">
+            <BarChart2 className="w-5 h-5" /> Dashboard
           </Link>
-          <Link href="#">
-            <a className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
-              <BarChart2 className="w-5 h-5" /> Library
-            </a>
+          <Link href="#" className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
+            <BarChart2 className="w-5 h-5" /> Library
           </Link>
-          <Link href="#">
-            <a className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
-              <Heart className="w-5 h-5" /> Liked Songs
-            </a>
+          <Link href="#" className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
+            <Heart className="w-5 h-5" /> Liked Songs
           </Link>
-          <Link href="#">
-            <a className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
-              <TrendingUp className="w-5 h-5" /> Trending
-            </a>
+          <Link href="#" className="flex items-center gap-3 px-4 py-2 rounded-xl text-foreground hover:bg-accent/30">
+            <TrendingUp className="w-5 h-5" /> Trending
           </Link>
         </nav>
         <hr className="my-2 border-border" />
