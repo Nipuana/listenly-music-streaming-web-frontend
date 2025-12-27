@@ -4,34 +4,13 @@ import { Music, Play, Users, Share2, TrendingUp } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
+import Header from '../components/layout/header';
+import Footer from '../components/layout/footer';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-background flex flex-col">
-      {/* Header */}
-      <header className="bg-background/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-primary">
-              <Music className="w-7 h-7 text-primary-foreground" />
-            </div>
-            <h1 className="text-3xl font-bold text-primary">
-              Listenly
-            </h1>
-          </div>
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-foreground hover:text-secondary transition-colors">Features</a>
-            <a href="#about" className="text-foreground hover:text-secondary transition-colors">About</a>
-            <a href="#pricing" className="text-foreground hover:text-secondary transition-colors">Pricing</a>
-            <Button asChild variant="ghost" className="text-primary hover:bg-button-ghost-hover">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary-hover">
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-1 w-full">
@@ -143,56 +122,7 @@ export default function LandingPage() {
         </Card>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-background/60 backdrop-blur-md border-t border-border mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* About */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow bg-primary">
-                <Music className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <span className="text-xl font-bold text-primary">Listenly</span>
-            </div>
-            <p className="text-foreground-muted text-sm mb-4">
-              The ultimate music streaming platform. Discover new music, create playlists, and connect with friends.
-            </p>
-            <p className="text-xs text-foreground-muted">© 2024 Listenly. All rights reserved.</p>
-          </div>
-          {/* Product */}
-          <div>
-            <h3 className="font-semibold mb-2 text-primary">Product</h3>
-            <ul className="space-y-1 text-sm">
-              <li><a href="#features" className="hover:text-secondary">Features</a></li>
-              <li><a href="#" className="hover:text-secondary">Music Library</a></li>
-              <li><a href="#" className="hover:text-secondary">For Artists</a></li>
-            </ul>
-          </div>
-          {/* Company */}
-          <div>
-            <h3 className="font-semibold mb-2 text-primary">Company</h3>
-            <ul className="space-y-1 text-sm">
-              <li><a href="#about" className="hover:text-secondary">About</a></li>
-              <li><a href="#pricing" className="hover:text-secondary">Pricing</a></li>
-              <li><a href="#" className="hover:text-secondary">Contact</a></li>
-            </ul>
-          </div>
-          {/* Newsletter */}
-          <div>
-            <h3 className="font-semibold mb-2 text-primary">Stay Updated</h3>
-            <form className="flex flex-col gap-2">
-              <input
-                type="email"
-                placeholder="Your email"
-                className="rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-secondary bg-background"
-              />
-              <Button type="submit" className="bg-secondary text-secondary-foreground font-semibold">
-                Subscribe
-              </Button>
-            </form>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
