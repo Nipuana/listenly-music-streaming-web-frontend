@@ -11,7 +11,7 @@ import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email({ message: "Please enter a valid email address" }),
   password: z.string().min(6, "Password must be at least 6 characters"),
   remember: z.boolean().optional(),
 });
@@ -121,7 +121,7 @@ export default function LoginForm() {
             </div>
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-foreground">
-                <Checkbox id="remember" {...register("remember")} />
+                <Checkbox id="remember" {...register("remember")} className="border-black" />
                 Remember me
               </label>
               <Link href="#" className="text-sm text-secondary hover:underline">
@@ -139,7 +139,7 @@ export default function LoginForm() {
             <div className="flex gap-2">
               <Button type="button" variant="outline" className="flex-1" aria-label="Sign in with Google">
                 <Image
-                  src="/public/icons/google-logo.png"
+                  src="/icons/google-logo.svg"
                   alt="Google"
                   width={20}
                   height={20}
@@ -148,7 +148,7 @@ export default function LoginForm() {
               </Button>
               <Button type="button" variant="outline" className="flex-1" aria-label="Sign in with Apple">
                 <Image
-                  src="/public/icons/apple-logo.svg"
+                  src="/icons/apple-logo.svg"
                   alt="Apple"
                   width={20}
                   height={20}
