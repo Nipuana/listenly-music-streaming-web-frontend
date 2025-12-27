@@ -64,7 +64,6 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
         <div className="text-center mb-16">
-          <Badge className="mb-4 bg-accent text-accent-foreground border-0">Features</Badge>
           <h2 className="text-4xl mb-4 font-bold text-primary">Everything You Need</h2>
           <p className="text-xl text-foreground-muted max-w-2xl mx-auto">
             Powerful features to enhance your music streaming experience
