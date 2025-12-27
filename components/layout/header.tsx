@@ -20,7 +20,7 @@ export default function Header() {
             <Link href="/login">Login</Link>
           </Button>
           <Button asChild className="bg-secondary text-secondary-foreground hover:bg-secondary-hover">
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/register">Sign Up</Link>
           </Button>
         </nav>
       </div>

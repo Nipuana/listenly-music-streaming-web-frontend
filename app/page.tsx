@@ -53,7 +53,7 @@ export default function LandingPage() {
                 <Users className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <div className="text-2xl font-bold text-primary">1.2M+</div>
+                <div className="text-2xl font-bold text-primary">1+</div>
                 <div className="text-sm text-foreground-muted">Active Users</div>
               </div>
             </div>
@@ -116,7 +116,7 @@ export default function LandingPage() {
               Join millions of music lovers on Listenly. Start streaming for free today.
             </p>
             <Button asChild size="lg" className="g-secondary text-secondary-foreground hover:bg-secondary-hover">
-              <Link href="/signup">Create Free Account</Link>
+              <Link href="/register">Create Free Account</Link>
             </Button>
           </CardContent>
         </Card>
