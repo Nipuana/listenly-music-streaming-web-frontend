@@ -10,9 +10,5 @@ const AxiosInstance = axios.create({
   },
 });
 
-async function getAuthToken() {
-  // Simulate an async operation to get the auth token
-  return 'your-auth-token';
-}
 
 export default AxiosInstance;
