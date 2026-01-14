@@ -13,6 +13,7 @@ export const register = async ( registerData : any ) => {
         return response.data;
     } catch (err: Error | any) {
         throw new Error(
+            // 400-500 err code counts as exception
             err.response?.data?.message // log error message from backend
              || err.message // default error message
              || "Registration failed" //fallback message if default fails
