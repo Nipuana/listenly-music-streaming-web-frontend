@@ -2,6 +2,7 @@
 // Single source of truth for api endpoints
 
 export const API = {
-  REGISTER: '/auth/register',
-  LOGIN: '/auth/login',
+ AUTH:{
+    REGISTER: 'api/auth/register',
+    LOGIN: 'api/auth/login',}
 };
