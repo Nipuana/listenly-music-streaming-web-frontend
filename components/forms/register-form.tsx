@@ -24,12 +24,15 @@ export default function RegisterForm() {
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
         formState: { errors },
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
     });
 
     const [error, setError] = useState<string>("");
+    const agreeValue = watch("agree");
     const onSubmit = async (data: RegisterFormValues) => {
         setError("");
         try {
@@ -139,7 +142,12 @@ export default function RegisterForm() {
                             )}
                         </div>
                         <div className="flex items-center gap-2">
-                            <Checkbox id="agree" {...register("agree")} className="border-black" />
+                            <Checkbox
+                                id="agree"
+                                checked={!!agreeValue}
+                                onCheckedChange={checked => setValue("agree", !!checked, { shouldValidate: true })}
+                                className="border-black"
+                            />
                             <label htmlFor="agree" className="text-sm text-foreground select-none">
                                 I agree to the
                                 <Link href="#" className="text-secondary underline mx-1">Terms of Service</Link>
