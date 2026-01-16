@@ -9,6 +9,8 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
+import { useState } from "react";
+import { handleLogin } from "@/lib/actions/auth-acitons";
 
 const loginSchema = z.object({
   email: z.email({ message: "Please enter a valid email address" }),
@@ -28,10 +30,20 @@ export default function LoginForm() {
       remember: false,
     },
   });
-
-  function onSubmit(data: LoginFormValues) {
-    // Handle login logic here
-    router.push("/dashboard");
+  const[error,setError]=useState("");
+  async function onSubmit(data: LoginFormValues) {
+    setError("");
+    try{
+      const result=await handleLogin(data);
+      if(result.success){
+        // Redirect or perform actions on successful login
+        router.push("/dashboard");
+      }else{
+        setError(result.message || "Login failed");
+      }
+    }catch(err: Error | any){
+      setError(err.message || "Login failed");
+    }
   }
 
   return (

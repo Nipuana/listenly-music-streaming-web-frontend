@@ -1,8 +1,8 @@
 // server side processing of both actions
 "use server";
-import { register } from "../api/auth";
+import { login, register } from "../api/auth";
 
-export const handleRegister = async (formData: FormData) => {
+export const handleRegister = async (formData: any) => {
     try{
         //how to get data from component
         const result=await register(formData);
@@ -24,4 +24,29 @@ export const handleRegister = async (formData: FormData) => {
             message: err.message || "Registration failed"
         };
     }
+
+}
+export const handleLogin = async (formData: any) => {
+    try{
+        //how to get data from component
+        const result=await login(formData);
+        // how to send back to component
+        if(result.success){
+            return {
+                success: true,
+                message: "Login successful",
+                data: result.data
+                };
+        }
+        return {
+            success: false,
+            message: result.message || "Login failed"
+        };
+    }catch(err: Error | any){
+        return {
+            success: false,
+            message: err.message || "Login failed"
+        };
+    }
+
 }

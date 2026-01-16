@@ -1,5 +1,7 @@
 "use client";
-
+import { handleRegister } from "@/lib/actions/auth-acitons";
+import router from "next/router";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,24 +13,10 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "../ui/dropdown-menu";
+import { registerSchema } from "@/app/(auth)/utils/registerSchema";
 
-const registerSchema = z.object({
-    name: z.string().min(2, "Full name is required"),
-    email: z.email({ message: "Please enter a valid email address" }),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z.string().min(6, "Please confirm your password"),
-    accountType: z.string().min(1, "Select account type"),
-    agree: z.literal(true, { message: "You must agree to the terms" }),
-}).refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-});
+
+
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -39,18 +27,21 @@ export default function RegisterForm() {
         formState: { errors },
     } = useForm<RegisterFormValues>({
         resolver: zodResolver(registerSchema),
-        defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            confirmPassword: "",
-            accountType: "",
-            agree: true,
-        },
     });
 
-    function onSubmit(data: RegisterFormValues) {
-        // Handle registration logic here
+    const [error, setError] = useState<string>("");
+    const onSubmit = async (data: RegisterFormValues) => {
+        setError("");
+        try {
+            const result = await handleRegister(data);
+            if (result.success) {
+                router.push("/dashboard");
+            } else {
+                throw new Error(result.message || "Registration failed");
+            }
+        } catch (err: any) {
+            setError(err.message || "Registration failed");
+        }
     }
 
     return (
@@ -64,24 +55,24 @@ export default function RegisterForm() {
                     </p>
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="name">
-                                Full Name
+                            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="username">
+                                Username
                             </label>
                             <div className="relative">
                                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                                     <FaUser size={16} />
                                 </span>
                                 <Input
-                                    id="name"
+                                    id="username"
                                     type="text"
-                                    placeholder="Your full name"
-                                    className={`pl-10 ${errors.name ? "border-error" : "border-input"}`}
-                                    {...register("name")}
-                                    autoComplete="name"
+                                    placeholder="Your username"
+                                    className={`pl-10 ${errors.username ? "border-error" : "border-input"}`}
+                                    {...register("username")}
+                                    autoComplete="username"
                                 />
                             </div>
-                            {errors.name && (
-                                <p className="text-xs text-error mt-1">{errors.name.message}</p>
+                            {errors.username && (
+                                <p className="text-xs text-error mt-1">{errors.username.message}</p>
                             )}
                         </div>
                         <div>
@@ -145,56 +136,6 @@ export default function RegisterForm() {
                             </div>
                             {errors.confirmPassword && (
                                 <p className="text-xs text-error mt-1">{errors.confirmPassword.message}</p>
-                            )}
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="accountType">
-                                Account Type
-                            </label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        className={`w-full justify-between ${errors.accountType ? "border-error" : "border-input"}`}
-                                        id="accountType"
-                                    >
-                                        {(() => {
-                                            const value = (typeof window !== "undefined"
-                                                ? (document.querySelector('input[name="accountType"]') as HTMLInputElement | null)?.value
-                                                : undefined) || "";
-                                            if (value === "listener") return "Listener";
-                                            if (value === "artist") return "Artist";
-                                            return "Select account type";
-                                        })()}
-                                        <ChevronDown className="w-4 h-4 ml-2 text-muted-foreground" />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start" className="w-full min-w-50">
-                                    <DropdownMenuItem onSelect={() => {
-                                        // @ts-ignore
-                                        document.querySelector('input[name="accountType"]').value = "listener";
-                                        // @ts-ignore
-                                        document.querySelector('input[name="accountType"]').dispatchEvent(new Event('input', { bubbles: true }));
-                                    }}>
-                                        Listener
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem onSelect={() => {
-                                        // @ts-ignore
-                                        document.querySelector('input[name="accountType"]').value = "artist";
-                                        // @ts-ignore
-                                        document.querySelector('input[name="accountType"]').dispatchEvent(new Event('input', { bubbles: true }));
-                                    }}>
-                                        Artist
-                                    </DropdownMenuItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                            <input
-                                type="hidden"
-                                {...register("accountType")}
-                            />
-                            {errors.accountType && (
-                                <p className="text-xs text-error mt-1">{errors.accountType.message}</p>
                             )}
                         </div>
                         <div className="flex items-center gap-2">
