@@ -11,14 +11,10 @@ import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { handleLogin } from "@/lib/actions/auth-acitons";
+import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
 
-const loginSchema = z.object({
-  email: z.email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  remember: z.boolean().optional(),
-});
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+
 
 export default function LoginForm() {
   const router = useRouter();
