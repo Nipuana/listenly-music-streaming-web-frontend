@@ -12,6 +12,8 @@ import { Checkbox } from "../ui/checkbox";
 import { useState } from "react";
 import { handleLogin } from "@/lib/actions/auth-acitons";
 import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
+import { setAuthToken, setUserData } from "@/lib/cookie";
+import { login } from "@/lib/api/auth";
 
 
 
@@ -30,13 +32,16 @@ export default function LoginForm() {
   async function onSubmit(data: LoginFormValues) {
     setError("");
     try{
-      const result=await handleLogin(data);
-      if(result.success){
-        // Redirect or perform actions on successful login
-        router.push("/dashboard");
-      }else{
-        setError(result.message || "Login failed");
-      }
+      
+      const result= await login(data)
+      await setAuthToken( result.token );
+      await setUserData( result.data );
+       if (result.success) {
+                router.push("/dashboard");
+            } else {
+                throw new Error(result.message || "Registration failed");
+            }
+      
     }catch(err: Error | any){
       setError(err.message || "Login failed");
     }

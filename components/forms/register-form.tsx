@@ -1,12 +1,13 @@
 "use client";
 import { handleRegister } from "@/lib/actions/auth-acitons";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Music } from "lucide-react";
 import { FaUser, FaEnvelope, FaKey } from "react-icons/fa";
+import { Eye, EyeOff } from "lucide-react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -21,6 +22,7 @@ import { registerSchema } from "@/app/(auth)/utils/registerSchema";
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterForm() {
+    const router = useRouter();
     const {
         register,
         handleSubmit,
@@ -32,13 +34,19 @@ export default function RegisterForm() {
     });
 
     const [error, setError] = useState<string>("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [passwordFocused, setPasswordFocused] = useState(false);
+    const [confirmPasswordFocused, setConfirmPasswordFocused] = useState(false);
+    const passwordValue = watch("password");
+    const confirmPasswordValue = watch("confirmPassword");
     const agreeValue = watch("agree");
     const onSubmit = async (data: RegisterFormValues) => {
         setError("");
         try {
             const result = await handleRegister(data);
             if (result.success) {
-                router.push("/dashboard");
+                router.push("/login");
             } else {
                 throw new Error(result.message || "Registration failed");
             }
@@ -109,12 +117,25 @@ export default function RegisterForm() {
                                 </span>
                                 <Input
                                     id="password"
-                                    type="password"
+                                    type={showPassword ? "text" : "password"}
                                     placeholder="********"
-                                    className={`pl-10 ${errors.password ? "border-error" : "border-input"}`}
+                                    className={`pl-10 pr-10 ${errors.password ? "border-error" : "border-input"}`}
                                     {...register("password")}
                                     autoComplete="new-password"
+                                    onFocus={() => setPasswordFocused(true)}
+                                    onBlur={() => setPasswordFocused(false)}
                                 />
+                                {(passwordValue || passwordFocused) && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground focus:outline-none"
+                                        onClick={() => setShowPassword((prev) => !prev)}
+                                        tabIndex={0}
+                                        aria-label={showPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                )}
                             </div>
                             {errors.password && (
                                 <p className="text-xs text-error mt-1">{errors.password.message}</p>
@@ -130,12 +151,25 @@ export default function RegisterForm() {
                                 </span>
                                 <Input
                                     id="confirmPassword"
-                                    type="password"
+                                    type={showConfirmPassword ? "text" : "password"}
                                     placeholder="********"
-                                    className={`pl-10 ${errors.confirmPassword ? "border-error" : "border-input"}`}
+                                    className={`pl-10 pr-10 ${errors.confirmPassword ? "border-error" : "border-input"}`}
                                     {...register("confirmPassword")}
                                     autoComplete="new-password"
+                                    onFocus={() => setConfirmPasswordFocused(true)}
+                                    onBlur={() => setConfirmPasswordFocused(false)}
                                 />
+                                {(confirmPasswordValue || confirmPasswordFocused) && (
+                                    <button
+                                        type="button"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground focus:outline-none"
+                                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                                        tabIndex={0}
+                                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                                    >
+                                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                )}
                             </div>
                             {errors.confirmPassword && (
                                 <p className="text-xs text-error mt-1">{errors.confirmPassword.message}</p>
