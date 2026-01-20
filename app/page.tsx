@@ -27,7 +27,7 @@ export default function LandingPage() {
             </p>
             <div className="flex gap-4">
               <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover">
-                <Link href="/signup">
+                <Link href="/register">
                   <Play className="w-5 h-5 mr-2" />
                   Get Started Free
                 </Link>
