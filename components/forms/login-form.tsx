@@ -32,18 +32,20 @@ export default function LoginForm() {
   async function onSubmit(data: LoginFormValues) {
     setError("");
     try{
-      
       const result= await login(data)
       await setAuthToken( result.token );
       await setUserData( result.data );
-       if (result.success) {
-                router.push("/dashboard");
-            } else {
-                throw new Error(result.message || "Registration failed");
-            }
-      
+      if (result.success) {
+        router.push("/dashboard");
+      } else {
+        throw new Error(result.message || "Login failed");
+      }
     }catch(err: Error | any){
-      setError(err.message || "Login failed");
+      let msg = err?.message;
+      if (!msg || msg === "Error") {
+        msg = "Unable to connect to the server. Please try again later.";
+      }
+      setError(msg || "Login failed");
     }
   }
 
