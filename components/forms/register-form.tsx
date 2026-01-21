@@ -51,7 +51,11 @@ export default function RegisterForm() {
                 throw new Error(result.message || "Registration failed");
             }
         } catch (err: any) {
-            setError(err.message || "Registration failed");
+            let msg = err?.message;
+            if (!msg || msg === "Error") {
+                msg = "Unable to connect to the server. Please try again later.";
+            }
+            setError(msg || "Registration failed");
         }
     }
 
@@ -64,6 +68,11 @@ export default function RegisterForm() {
                     <p className="text-muted-foreground text-sm mb-6">
                         Join Listenly and start your music journey
                     </p>
+                    {error && (
+                        <div className="bg-error/10 border border-error text-error px-4 py-3 rounded-lg mb-4 text-sm">
+                            {error}
+                        </div>
+                    )}
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div>
                             <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="username">
