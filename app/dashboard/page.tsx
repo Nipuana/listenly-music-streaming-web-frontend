@@ -1,3 +1,4 @@
+"use client"
 import { Music, BarChart2, Heart, TrendingUp, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import {
@@ -12,6 +13,7 @@ import {
   SidebarSeparator,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { useAuth } from "../context/auth-context";
 
 const playlists = [
   { name: "Chill Vibes" },
@@ -20,6 +22,7 @@ const playlists = [
 ];
 
 export default function DashboardPage() {
+  const { user,logout }=useAuth();
   return (
     <SidebarProvider>
       <div className="min-h-screen flex bg-background">
