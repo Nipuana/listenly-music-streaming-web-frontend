@@ -14,11 +14,14 @@ import { handleLogin } from "@/lib/actions/auth-acitons";
 import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
 import { setAuthToken, setUserData } from "@/lib/cookie";
 import { login } from "@/lib/api/auth";
+import { useAuth } from "@/app/context/auth-context";
 
 
 
 
 export default function LoginForm() {
+
+  const { checkAuth }=useAuth()
   const router = useRouter();
   const {register,handleSubmit,formState: { errors }} = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -36,6 +39,7 @@ export default function LoginForm() {
       await setAuthToken( result.token );
       await setUserData( result.data );
       if (result.success) {
+        await checkAuth()
         router.push("/dashboard");
       } else {
         throw new Error(result.message || "Login failed");
