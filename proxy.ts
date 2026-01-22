@@ -4,12 +4,14 @@ import { getAuthToken, getUserData } from "./lib/cookie";
 export async function proxy(req:NextRequest){
     const publicPaths=['/login', 'register',"/forget-password","/"]
     const adminPaths=['/ad-dash']
+    const userPaths=['/dashboard']
 
     const { pathname }= req.nextUrl;
     const token = await getAuthToken();
 
     const user = token? await getUserData():null;
     const ispublicPath = publicPaths.some((path)=> pathname.startsWith(path));
+    const isuserPath= userPaths.some((path)=>pathname.startsWith(path));
     const isadminPath= adminPaths.some((path)=>pathname.startsWith(path))
 
     if(user && token){
@@ -18,7 +20,7 @@ export async function proxy(req:NextRequest){
         }
     }
 
-    if(!ispublicPath && !user){
+    if((isuserPath || isadminPath) && !user){
         return NextResponse.redirect(new URL ("/login",req.url))
     }
 
@@ -30,8 +32,8 @@ export async function proxy(req:NextRequest){
 
 export const config ={
     matcher: [
-        "/admin/:path*",
-        "/user/:path*",
+        "/ad-dash/:path*",
+        "/dashboard/:path*",
         "/login",
         "/register"
 

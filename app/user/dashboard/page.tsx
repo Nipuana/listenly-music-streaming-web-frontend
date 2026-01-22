@@ -13,7 +13,7 @@ import {
   SidebarSeparator,
   SidebarFooter,
 } from "@/components/ui/sidebar";
-import { useAuth } from "../context/auth-context";
+import { useAuth } from "../../context/auth-context";
 
 const playlists = [
   { name: "Chill Vibes" },
