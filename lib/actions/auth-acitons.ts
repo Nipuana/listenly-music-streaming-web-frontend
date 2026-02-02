@@ -1,6 +1,9 @@
 // server side processing of both actions
 "use server";
-import { login, register } from "../api/auth";
+import { revalidatePath } from "next/cache";
+import { login, register,getProfile, updateProfile } from "../api/api-calls/auth";
+import { setUserData } from "../cookie";
+import { success } from "zod";
 
 export const handleRegister = async (formData: any) => {
     try{
@@ -49,4 +52,52 @@ export const handleLogin = async (formData: any) => {
         };
     }
 
+}
+
+export const handleGetProfile= async()=>{
+    try{
+        const result= await getProfile();
+        if(result.success){
+            return {
+                success:true,
+                data: result.data
+            };
+        }
+        return {
+            success:false,
+            message: result.message || "Fetching profile failed"
+        };
+    }catch(err: Error | any){
+        return {
+            success:false,
+            message: err.message || "Fetching profile failed"
+        };
+    }
+}
+
+export const handleUpdateData= async (formData: any) => {
+    try{
+        const result = await updateProfile(formData);
+        if (result.success){
+            //update cookie
+            await setUserData(result.data)
+
+            revalidatePath("/user/profile")
+        
+        return{
+            success:true,
+            message: "Profile updated successfully",
+            data: result.data
+        };
+    }
+     return {
+            success:false,
+            message: result.message || "Updating profile failed"
+        };
+    }catch(err: Error | any){
+        return {
+            success:false,
+            message: err.message || "Updating profile failed"
+        };
+    }
 }
