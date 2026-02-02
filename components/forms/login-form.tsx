@@ -1,5 +1,5 @@
 "use client";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,8 +13,8 @@ import { useState } from "react";
 import { handleLogin } from "@/lib/actions/auth-acitons";
 import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
 import { setAuthToken, setUserData } from "@/lib/cookie";
-import { login } from "@/lib/api/auth";
-import { useAuth } from "@/app/context/auth-context";
+import { login } from "@/lib/api/api-calls/auth";
+import { useAuth } from "@/app/(auth)/context/auth-context";
 
 
 
@@ -23,28 +23,37 @@ export default function LoginForm() {
 
   const { checkAuth }=useAuth()
   const router = useRouter();
-  const {register,handleSubmit,formState: { errors }} = useForm<LoginFormValues>({
+  const { register, handleSubmit, formState: { errors }, control } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      remember: false,
+      remember: true,
     },
   });
   const[error,setError]=useState("");
   async function onSubmit(data: LoginFormValues) {
     setError("");
-    try{
-      const result= await login(data)
-      await setAuthToken( result.token );
-      await setUserData( result.data );
+    try {
+      const result = await login(data);
       if (result.success) {
-        await checkAuth()
-        router.push("/dashboard");
+        // Only save cookies if 'remember me' is checked
+        if (data.remember) {
+          await setAuthToken(result.token);
+          await setUserData(result.data);
+        }
+        await checkAuth();
+        // Check the user's role and navigate accordingly
+        if (result.data && result.data.role === "user") {
+          router.push("/user/dashboard");
+        } 
+        if(result.data && result.data.role=="admin") {
+          router.push("/admin/ad-dash");
+        }
       } else {
-        throw new Error(result.message || "Login failed");
+        throw new Error(result.message || "Login failed due to role issue contact support");
       }
-    }catch(err: Error | any){
+    } catch (err: Error | any) {
       let msg = err?.message;
       if (!msg || msg === "Error") {
         msg = "Unable to connect to the server. Please try again later.";
@@ -92,6 +101,14 @@ export default function LoginForm() {
           <p className="text-muted-foreground text-sm mb-6">
             Enter your credentials to access your account
           </p>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 flex items-start gap-2">
+              <svg className="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div>
               <label className="block text-sm font-medium mb-1 text-foreground" htmlFor="email">
@@ -137,7 +154,18 @@ export default function LoginForm() {
             </div>
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm text-foreground">
-                <Checkbox id="remember" {...register("remember")} className="border-black" />
+                <Controller
+                  name="remember"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="remember"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="border-black"
+                    />
+                  )}
+                />
                 Remember me
               </label>
               <Link href="#" className="text-sm text-secondary hover:underline">
