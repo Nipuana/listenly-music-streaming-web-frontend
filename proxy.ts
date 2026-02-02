@@ -1,42 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthToken, getUserData } from "./lib/cookie";
 
+const publicPaths = ['/login', '/register', '/forget-password', '/'];
+const adminPrefix = '/admin';
+const userPrefix = '/user';
+
 export async function proxy(req:NextRequest){
-    const publicPaths=['/login', 'register',"/forget-password","/"]
-    const adminPaths=['/ad-dash']
-    const userPaths=['/dashboard']
-
-    const { pathname }= req.nextUrl;
+    const { pathname } = req.nextUrl;
     const token = await getAuthToken();
+    const user = token ? await getUserData() : null;
 
-    const user = token? await getUserData():null;
-    const ispublicPath = publicPaths.some((path)=> pathname.startsWith(path));
-    const isuserPath= userPaths.some((path)=>pathname.startsWith(path));
-    const isadminPath= adminPaths.some((path)=>pathname.startsWith(path))
-
-    if(user && token){
-        if(isadminPath && user.role !== 'admin'){
-            return  NextResponse.redirect(new URL ("/not-found",req.url))
+    //Protect /admin routes
+    if (pathname.startsWith(adminPrefix)) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
+        if (user.role !== 'admin') {
+            return NextResponse.redirect(new URL('/not-found', req.url));
         }
     }
 
-    if((isuserPath || isadminPath) && !user){
-        return NextResponse.redirect(new URL ("/login",req.url))
+    //Protect /user routes
+    if (pathname.startsWith(userPrefix)) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
+        if (user.role !== 'user') {
+            return NextResponse.redirect(new URL('/not-found', req.url));
+        }
     }
 
-    if(ispublicPath && user){
-        return NextResponse.redirect(new URL("/dashboard",req.url))
+    // stop alr  logged in users from accessing public pages
+    const isPublic = publicPaths.some((path) => path === "/" ? pathname === "/" : pathname === path);
+    if (isPublic && user) {
+        // Redirect based on role
+        if (user.role === 'admin') {
+            return NextResponse.redirect(new URL('/admin/ad-dash', req.url));
+        }
+        if(user.role ==='user'){
+            return NextResponse.redirect(new URL('/user/dashboard', req.url));
+        }
+        else {
+            return NextResponse.redirect(new URL('/not-found', req.url));
+        }
     }
-    return NextResponse.next(); //continue granted
+
+    // Let Next.js handle 404s for non-existent routes
+    return NextResponse.next();
 }
 
 export const config ={
     matcher: [
-        "/ad-dash/:path*",
-        "/dashboard/:path*",
+        "/admin/:path*",
+        "/user/:path*",
         "/login",
-        "/register"
-
+        "/register",
+        "/forget-password",
+        "/"
     ]
 }
 
