@@ -2,7 +2,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { login, register,getProfile, updateProfile, requestPasswordReset, resetPassword } from "../api/api-calls/user_APIs/auth_APIs/auth";
-import { setUserData } from "../cookies/user-data-cookies";
+import { setUserData } from "../cookies/user-data-cookie";
 import { success } from "zod";
 
 export const handleRegister = async (formData: any) => {
