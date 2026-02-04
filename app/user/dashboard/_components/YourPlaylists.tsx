@@ -30,7 +30,7 @@ export function YourPlaylists() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Your Playlists</CardTitle>
-          <Button asChild variant="link" className="text-secondary p-0">
+          <Button asChild variant="link" className="p-0">
             <Link href="/user/playlists">View All</Link>
           </Button>
         </div>
@@ -39,7 +39,7 @@ export function YourPlaylists() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {playlists.map((playlist) => (
             <Link key={playlist.id} href={`/user/playlist/${playlist.id}`}>
-              <Card className="border-border/50 hover:shadow-lg transition-all cursor-pointer">
+              <Card className="border-border/50 hover:shadow-primary transition-all cursor-pointer">
                 <CardContent className="p-4">
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
                     <Image

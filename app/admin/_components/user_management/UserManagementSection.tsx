@@ -1,6 +1,8 @@
 import React, { useState, useCallback, memo, useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import { Trash2, Users, ShieldCheck, Mic2, Crown, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { handleGetAllUsers, handleUpdateUser, handleDeleteUser, handleCreateUser } from "@/lib/actions/admin-actions";
 import UserEditModal from "./UserEditModal";
 import DeleteConfirmModal from "./DeleteConfirmModal";
@@ -20,12 +22,12 @@ const getInitials = (name: string) => {
 // Helper function to get role badge color
 const getRoleBadge = (role: string) => {
   const badges = {
-    user: { bg: 'bg-blue-100', text: 'text-blue-700', icon: Users },
-    admin: { bg: 'bg-purple-100', text: 'text-purple-700', icon: ShieldCheck },
-    artist: { bg: 'bg-orange-100', text: 'text-orange-700', icon: Mic2 },
-    puser: { bg: 'bg-emerald-100', text: 'text-emerald-700', icon: Crown },
+    user: { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-700 dark:text-blue-200', icon: Users },
+    admin: { bg: 'bg-purple-100 dark:bg-purple-900', text: 'text-purple-700 dark:text-purple-200', icon: ShieldCheck },
+    artist: { bg: 'bg-pink-100 dark:bg-pink-900', text: 'text-pink-700 dark:text-pink-200', icon: Mic2 },
+    puser: { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-700 dark:text-green-200', icon: Crown },
   };
-  return badges[role.toLowerCase() as keyof typeof badges] || badges.user;
+  return badges[role?.toLowerCase() as keyof typeof badges] || badges.user;
 };
 
 export default function UserManagementSection() {
@@ -94,7 +96,7 @@ export default function UserManagementSection() {
         setUsers(users.filter(u => u.id !== deleteUser.id));
         setDeleteOpen(false);
         toast.error(`${deleteUser.name} has been deleted`, {
-          icon: <Trash2 className="w-5 h-5 text-red-500" />,
+          icon: <Trash2 className="w-5 h-5 text-destructive" />,
           autoClose: 3000,
         });
       } else {
@@ -190,108 +192,108 @@ export default function UserManagementSection() {
   }, [users]);
 
   return (
-    <section className="p-6">
-      <h2 className="text-2xl font-bold mb-4">User Management</h2>
-      <div className="bg-white rounded-2xl shadow-lg p-6">
+    <section className="p-app-gutter">
+      <h2 className="text-2xl font-bold mb-4 text-foreground">User Management</h2>
+      <div className="bg-card rounded-2xl shadow-primary p-6 border border-border">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h3 className="text-xl font-bold text-[#283F83]">User Directory</h3>
-            <p className="text-slate-500 text-sm mt-1">Manage your {users.length} registered users</p>
+            <h3 className="text-xl font-bold text-foreground">User Directory</h3>
+            <p className="text-muted-foreground text-sm mt-1">Manage your {users.length} registered users</p>
           </div>
-          <button 
+          <Button 
             onClick={() => setAddOpen(true)}
-            className="bg-linear-to-r from-[#283F83] to-[#476FE9] hover:from-[#476FE9] hover:to-[#283F83] text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-blue-200 transition-all hover:scale-105"
+            className="hover:scale-105"
           >
             Add User
-          </button>
+          </Button>
         </div>
 
         {/* Search Bar */}
         <div className="mb-4">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-            <input
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
+            <Input
               type="text"
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-sm"
+              className="pl-12"
             />
           </div>
         </div>
 
         {/* Filter Bar */}
-        <div className="flex gap-2 mb-6 p-2 bg-slate-50 rounded-xl">
+        <div className="flex gap-2 mb-6 p-2 bg-muted rounded-xl">
           <button
             onClick={() => setRoleFilter('all')}
             className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               roleFilter === 'all'
-                ? 'bg-white text-[#283F83] shadow-md'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                ? 'bg-primary text-primary-foreground shadow-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-primary/10'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               All Users
-              <span className="text-xs bg-slate-200 px-2 py-0.5 rounded-full">{roleCounts.all}</span>
+              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.all}</span>
             </span>
           </button>
           <button
             onClick={() => setRoleFilter('user')}
             className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               roleFilter === 'user'
-                ? 'bg-white text-blue-700 shadow-md'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                ? 'bg-primary text-primary-foreground shadow-primary'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               <Users className="w-4 h-4" />
               Users
-              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">{roleCounts.user}</span>
+              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.user}</span>
             </span>
           </button>
           <button
             onClick={() => setRoleFilter('admin')}
             className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               roleFilter === 'admin'
-                ? 'bg-white text-purple-700 shadow-md'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                ? 'bg-secondary text-secondary-foreground shadow-primary'
+                : 'text-muted-foreground hover:text-secondary hover:bg-secondary/10'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               <ShieldCheck className="w-4 h-4" />
               Admins
-              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">{roleCounts.admin}</span>
+              <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">{roleCounts.admin}</span>
             </span>
           </button>
           <button
             onClick={() => setRoleFilter('artist')}
             className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               roleFilter === 'artist'
-                ? 'bg-white text-orange-700 shadow-md'
-                : 'text-slate-500 hover:text-slate-700 hover:bg-white/50'
+                ? 'bg-primary text-primary-foreground shadow-primary'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
             }`}
           >
             <span className="flex items-center justify-center gap-2">
               <Mic2 className="w-4 h-4" />
               Artists
-              <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full">{roleCounts.artist}</span>
+              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.artist}</span>
             </span>
           </button>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : filteredUsers.length === 0 ? (
-          <div className="text-center py-12 text-slate-500">
+          <div className="text-center py-12 text-muted-foreground">
             <p>No users found for selected filter</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-left">
               <thead>
-                <tr className="text-slate-400 text-xs uppercase tracking-wider border-b-2 border-slate-100">
+                <tr className="text-muted-foreground text-xs uppercase tracking-wider border-b-2 border-border">
                   <th className="py-4 px-4 font-semibold">Avatar</th>
                   <th className="py-4 px-4 font-semibold">Username</th>
                   <th className="py-4 px-4 font-semibold">Email</th>
@@ -307,49 +309,53 @@ export default function UserManagementSection() {
                     <tr 
                       key={user.id} 
                       onClick={() => handleViewUser(user)}
-                      className="border-b last:border-b-0 hover:bg-blue-50/50 transition-colors cursor-pointer"
+                      className="border-b last:border-b-0 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
                       <td className="py-4 px-4">
                         {user.avatar ? (
-                          <img src={user.avatar} alt={user.name} className="w-11 h-11 rounded-full object-cover border-2 border-blue-100" />
+                          <img src={user.avatar} alt={user.name} className="w-11 h-11 rounded-full object-cover border-2 border-border" />
                         ) : (
-                          <div className="w-11 h-11 rounded-full bg-linear-to-br from-[#283F83] to-[#476FE9] flex items-center justify-center text-white font-bold text-sm border-2 border-blue-100">
+                          <div className="w-11 h-11 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm border-2 border-border">
                             {getInitials(user.name || user.email)}
                           </div>
                         )}
                       </td>
                       <td className="py-4 px-4">
-                        <div className="font-semibold text-[#283F83] text-sm">
+                        <div className="font-semibold text-foreground text-sm">
                           {user.name || user.username || user.userName || user.fullName || user.email?.split('@')[0] || 'N/A'}
                         </div>
                       </td>
                       <td className="py-4 px-4">
-                        <div className="text-sm text-slate-600">{user.email}</div>
+                        <div className="text-sm text-muted-foreground">{user.email}</div>
                       </td>
                       <td className="py-4 px-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${roleBadge.bg} ${roleBadge.text}`}>
-                          <RoleIcon className="w-3.5 h-3.5" />
-                          {user.role || 'User'}
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${roleBadge.bg} ${roleBadge.text} border border-border shadow-sm`}>
+                          <RoleIcon className="w-4 h-4" />
+                          <span className="capitalize">{user.role || 'User'}</span>
                         </span>
                       </td>
                       <td className="py-4 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                         <div className="flex gap-2 justify-end">
                           {user.role?.toLowerCase() === 'admin' ? (
-                            <span className="text-xs text-slate-400 italic px-4 py-2">Protected Account</span>
+                            <span className="text-xs text-muted-foreground italic px-4 py-2">Protected Account</span>
                           ) : (
                             <>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleEdit(user); }} 
-                                className="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-semibold hover:bg-blue-200 transition-all hover:scale-105 shadow-sm text-sm"
+                              <Button
+                                onClick={(e) => { e.stopPropagation(); handleEdit(user); }}
+                                variant="secondary"
+                                size="sm"
+                                className="font-semibold"
                               >
                                 Edit
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); handleDeleteClick(user); }} 
-                                className="px-4 py-2 rounded-lg bg-red-100 text-red-700 font-semibold hover:bg-red-200 transition-all hover:scale-105 shadow-sm text-sm"
+                              </Button>
+                              <Button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteClick(user); }}
+                                variant="destructive"
+                                size="sm"
+                                className="font-semibold"
                               >
                                 Delete
-                              </button>
+                              </Button>
                             </>
                           )}
                         </div>
@@ -365,14 +371,14 @@ export default function UserManagementSection() {
         {/* Pagination Controls */}
         {!loading && filteredUsers.length > usersPerPage && (
           <div className="flex items-center justify-between mt-6 px-4">
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-muted-foreground">
               Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-primary/10 hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Previous
               </button>
@@ -383,8 +389,8 @@ export default function UserManagementSection() {
                     onClick={() => setCurrentPage(page)}
                     className={`px-3 py-2 rounded-lg font-semibold transition-all ${
                       currentPage === page
-                        ? 'bg-linear-to-r from-[#283F83] to-[#476FE9] text-white shadow-md'
-                        : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                        ? 'bg-primary text-primary-foreground shadow-primary'
+                        : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
                     }`}
                   >
                     {page}
@@ -394,7 +400,7 @@ export default function UserManagementSection() {
               <button
                 onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-semibold hover:bg-slate-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-primary/10 hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
               </button>

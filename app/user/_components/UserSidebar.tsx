@@ -23,8 +23,8 @@ export function UserSidebar() {
           asChild
           className={`w-full justify-start ${
             pathname === "/user/dashboard"
-              ? "bg-[linear-gradient(to_right,var(--primary),var(--secondary))] text-white"
-              : "bg-transparent hover:bg-accent"
+              ? "bg-primary text-primary-foreground shadow-primary"
+              : "bg-transparent hover:bg-primary/10 hover:text-primary text-muted-foreground"
           }`}
           variant={pathname === "/user/dashboard" ? "default" : "ghost"}
         >
@@ -34,21 +34,21 @@ export function UserSidebar() {
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" className="w-full justify-start hover:bg-accent">
+        <Button asChild variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary text-muted-foreground">
           <Link href="/user/library">
             <Library className="w-5 h-5 mr-3" />
             Library
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" className="w-full justify-start hover:bg-accent">
+        <Button asChild variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary text-muted-foreground">
           <Link href="/user/liked">
             <Heart className="w-5 h-5 mr-3" />
             Liked Songs
           </Link>
         </Button>
 
-        <Button asChild variant="ghost" className="w-full justify-start hover:bg-accent">
+        <Button asChild variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary text-muted-foreground">
           <Link href="/user/trending">
             <TrendingUp className="w-5 h-5 mr-3" />
             Trending
@@ -66,7 +66,7 @@ export function UserSidebar() {
               key={playlist.id}
               asChild
               variant="ghost"
-              className="w-full justify-start hover:bg-accent h-auto py-2"
+              className="w-full justify-start hover:bg-primary/10 hover:text-primary text-muted-foreground h-auto py-2"
             >
               <Link href={`/user/playlist/${playlist.id}`}>
                 <Music className="w-4 h-4 mr-3" />
@@ -79,7 +79,7 @@ export function UserSidebar() {
         <Separator className="my-6" />
 
         <div className="space-y-2">
-          <Button asChild variant="ghost" className="w-full justify-start hover:bg-accent">
+          <Button asChild variant="ghost" className="w-full justify-start hover:bg-primary/10 hover:text-primary text-muted-foreground">
             <Link href="/user/feedback">
               <Settings className="w-5 h-5 mr-3" />
               Feedback

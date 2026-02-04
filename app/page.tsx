@@ -13,20 +13,20 @@ export default function LandingPage() {
       <Header />
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 flex-1 w-full">
+      <section className="app-container py-20 flex-1 w-full">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-5xl md:text-6xl mb-6 font-bold leading-tight text-primary">
               Your Music,<br />
-              <span className="bg-clip-text text-transparent bg-gradient-primary">
+              <span className="bg-clip-text text-gradient-primary bg-(--gradient-primary)">
                 Your Way
               </span>
             </h2>
-            <p className="text-xl text-foreground-muted mb-8">
+            <p className="text-xl text-muted-foreground mb-8">
               Stream millions of songs, create personalized playlists, and share your favorite music with friends. Join the Listenly community today.
             </p>
             <div className="flex gap-4">
-              <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary-hover">
+              <Button asChild size="lg">
                 <Link href="/register">
                   <Play className="w-5 h-5 mr-2" />
                   Get Started Free
@@ -62,7 +62,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features */}
-      <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+      <section id="features" className="app-container py-20 w-full">
         <div className="text-center mb-16">
           <h2 className="text-4xl mb-4 font-bold text-primary">Everything You Need</h2>
           <p className="text-xl text-foreground-muted max-w-2xl mx-auto">
@@ -107,14 +107,14 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+      <section className="app-container py-20 w-full">
         <Card className="border-none shadow-2xl bg-card text-primary-foreground overflow-hidden">
           <CardContent className="p-12 text-center">
             <h2 className="text-foreground text-4xl mb-4 font-bold">Ready to Get Started?</h2>
-            <p className="text-xl text-secondary-light mb-8 max-w-2xl mx-auto">
+            <p className="text-xl text-foreground-secondary mb-8 max-w-2xl mx-auto">
               Join millions of music lovers on Listenly. Start streaming for free today.
             </p>
-            <Button asChild size="lg" className="g-secondary text-secondary-foreground hover:bg-secondary-hover">
+            <Button asChild size="lg" className="bg-secondary text-secondary-foreground hover:opacity-90">
               <Link href="/register">Create Free Account</Link>
             </Button>
           </CardContent>

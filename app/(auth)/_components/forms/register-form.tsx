@@ -189,7 +189,7 @@ export default function RegisterForm() {
                                 id="agree"
                                 checked={!!agreeValue}
                                 onCheckedChange={checked => setValue("agree", !!checked, { shouldValidate: true })}
-                                className="border-black"
+                                className="border-border"
                             />
                             <label htmlFor="agree" className="text-sm text-foreground select-none">
                                 I agree to the
@@ -201,7 +201,7 @@ export default function RegisterForm() {
                         {errors.agree && (
                             <p className="text-xs text-error mt-1">{errors.agree.message}</p>
                         )}
-                        <Button type="submit" className="w-full bg-primary text-primary-foreground font-semibold mt-2">
+                        <Button type="submit" className="w-full mt-2">
                             Create Account
                         </Button>
                         <div className="flex items-center my-2">
@@ -226,7 +226,7 @@ export default function RegisterForm() {
                 {/* Right Panel (Info) */}
                 <div className="bg-primary rounded-2xl shadow-2xl p-10 flex flex-col justify-center min-h-120 text-primary-foreground">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white/20">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary-foreground/20">
                             <Music className="w-6 h-6 text-primary-foreground" />
                         </div>
                         <span className="text-2xl font-bold">Listenly</span>
@@ -234,28 +234,28 @@ export default function RegisterForm() {
                     <h2 className="text-3xl font-bold mb-2">Start Your Journey</h2>
                     <p className="mb-8">Join millions of music lovers and discover your next favorite song today.</p>
                     <div className="space-y-4">
-                        <div className="rounded-xl bg-white/10 p-4 flex items-center gap-4">
+                        <div className="rounded-xl bg-primary-foreground/10 p-4 flex items-center gap-4">
                             <span className="text-2xl">🎵</span>
                             <div>
                                 <div className="font-semibold">Unlimited Music</div>
                                 <div className="text-sm">Access millions of songs from all genres and eras</div>
                             </div>
                         </div>
-                        <div className="rounded-xl bg-white/10 p-4 flex items-center gap-4">
+                        <div className="rounded-xl bg-primary-foreground/10 p-4 flex items-center gap-4">
                             <span className="text-2xl">📝</span>
                             <div>
                                 <div className="font-semibold">Custom Playlists</div>
                                 <div className="text-sm">Create and share personalized playlists with friends</div>
                             </div>
                         </div>
-                        <div className="rounded-xl bg-white/10 p-4 flex items-center gap-4">
+                        <div className="rounded-xl bg-primary-foreground/10 p-4 flex items-center gap-4">
                             <span className="text-2xl">📊</span>
                             <div>
                                 <div className="font-semibold">For Artists</div>
                                 <div className="text-sm">Get verified and access detailed analytics dashboard</div>
                             </div>
                         </div>
-                        <div className="rounded-xl bg-white/10 p-4 flex items-center gap-4">
+                        <div className="rounded-xl bg-primary-foreground/10 p-4 flex items-center gap-4">
                             <span className="text-2xl">🔒</span>
                             <div>
                                 <div className="font-semibold">Secure Platform</div>

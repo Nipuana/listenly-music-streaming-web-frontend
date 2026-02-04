@@ -20,8 +20,8 @@ function SidebarItem({ icon, label, active, onClick, collapsed }: SidebarItemPro
       onClick={onClick}
       className={`w-full flex items-center ${collapsed ? 'justify-center' : 'gap-4'} px-4 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden ${
         active
-          ? "text-white"
-          : "text-slate-500 hover:bg-blue-50 hover:text-[#476FE9]"
+          ? "text-primary-foreground"
+          : "text-muted-foreground hover:bg-primary/10 hover:text-primary"
       }`}
       title={label}
       whileHover={{ scale: 1.02 }}
@@ -30,12 +30,12 @@ function SidebarItem({ icon, label, active, onClick, collapsed }: SidebarItemPro
       {active && (
         <motion.div
           layoutId="activeTab"
-          className="absolute inset-0 bg-linear-to-r from-[#283F83] to-[#476FE9] rounded-2xl shadow-lg shadow-blue-200"
+          className="absolute inset-0 bg-gradient-primary rounded-2xl shadow-primary"
           initial={false}
           transition={{ type: "spring", stiffness: 500, damping: 30 }}
         />
       )}
-      <span className={`${active ? "text-white" : "text-slate-400 group-hover:text-[#476FE9]"} transition-colors relative z-10`}>
+      <span className={`${active ? "text-primary-foreground" : "text-muted-foreground group-hover:text-primary"} transition-colors relative z-10`}>
         {icon}
       </span>
       {!collapsed && (
@@ -72,33 +72,33 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }: Sid
   };
 
   return (
-    <aside className={`bg-white/80 backdrop-blur-xl border-r border-blue-100 h-screen sticky top-0 hidden lg:flex flex-col transition-all duration-300 ${collapsed ? 'w-24 p-4' : 'w-72 p-6'}`}>
+    <aside className={`bg-card/80 backdrop-blur-xl border-r border-border h-screen sticky top-0 hidden lg:flex flex-col transition-all duration-300 ${collapsed ? 'w-24 p-4' : 'w-72 p-6'}`}>
       <div className="flex items-center justify-center mb-10">
         {collapsed ? (
-          <button onClick={() => setCollapsed(!collapsed)} className="p-2 focus:outline-none hover:bg-blue-50 rounded-xl transition-all" title="Expand sidebar">
-            <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#283F83] to-[#476FE9] flex items-center justify-center shadow-lg shadow-blue-200">
-              <Music2 className="w-6 h-6 text-white" />
+          <button onClick={() => setCollapsed(!collapsed)} className="p-2 focus:outline-none hover:bg-accent rounded-xl transition-all" title="Expand sidebar">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-primary border border-primary/20">
+              <Music2 className="w-6 h-6 text-primary" />
             </div>
           </button>
         ) : (
           <div className="flex items-center justify-between w-full px-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#283F83] to-[#476FE9] flex items-center justify-center shadow-lg shadow-blue-200">
-                <Music2 className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-primary border border-primary/20">
+                <Music2 className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-linear-to-r from-[#283F83] to-[#476FE9] bg-clip-text text-transparent">Listenly</h1>
-                <p className="text-[10px] uppercase tracking-widest text-[#476FE9] font-semibold">Admin Panel</p>
+                <h1 className="text-xl font-bold bg-(--gradient-primary) bg-clip-text text-gradient-primary">Listenly</h1>
+                <p className="text-[10px] uppercase tracking-widest text-secondary font-semibold">Admin Panel</p>
               </div>
             </div>
-            <button onClick={() => setCollapsed(!collapsed)} className="ml-auto p-2 focus:outline-none hover:bg-blue-50 rounded-lg transition-all" title="Collapse sidebar">
+            <button onClick={() => setCollapsed(!collapsed)} className="ml-auto p-2 focus:outline-none hover:bg-accent rounded-lg transition-all" title="Collapse sidebar">
               <span className="text-lg">←</span>
             </button>
           </div>
         )}
       </div>
       <nav className="space-y-1 flex-1">
-        {!collapsed && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">Main Menu</p>}
+        {!collapsed && <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-4 px-2">Main Menu</p>}
         <SidebarItem icon={<LayoutDashboard size={20} />} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} collapsed={collapsed} />
         <SidebarItem icon={<Users size={20} />} label="User Management" active={activeTab === "users"} onClick={() => setActiveTab("users")} collapsed={collapsed} />
         <SidebarItem icon={<Mic2 size={20} />} label="Artist Verification" active={activeTab === "artists"} onClick={() => setActiveTab("artists")} collapsed={collapsed} />
@@ -106,7 +106,7 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }: Sid
         <SidebarItem icon={<DollarSign size={20} />} label="Revenue & Plans" active={activeTab === "revenue"} onClick={() => setActiveTab("revenue")} collapsed={collapsed} />
         <SidebarItem icon={<MessageSquare size={20} />} label="Support & Feedback" active={activeTab === "feedback"} onClick={() => setActiveTab("feedback")} collapsed={collapsed} />
         <div className="pt-8">
-          {!collapsed && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">System</p>}
+          {!collapsed && <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-4 px-2">System</p>}
           <SidebarItem 
             icon={mounted ? (isDark ? <Moon size={20} /> : <Sun size={20} />) : <Sun size={20} />} 
             label={mounted ? (isDark ? "Dark Mode" : "Light Mode") : "Theme Toggle"} 
@@ -123,32 +123,32 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }: Sid
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="User Avatar" className="w-10 h-10 rounded-full object-cover" />
             ) : (
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-sm">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-sm">
                 {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}
               </div>
             )}
             {onLogout && (
-              <button onClick={onLogout} className="p-2 rounded-full hover:bg-blue-50 transition-colors" title="Logout">
-                <LogOut className="w-5 h-5 text-blue-500" />
+              <button onClick={onLogout} className="p-2 rounded-full hover:bg-accent transition-colors" title="Logout">
+                <LogOut className="w-5 h-5 text-muted-foreground" />
               </button>
             )}
           </div>
         ) : (
-          <div className="flex items-center p-3 rounded-2xl border border-blue-100 bg-white/70 shadow-sm w-full max-w-xs relative">
+          <div className="flex items-center p-3 rounded-2xl border border-border bg-card/70 shadow-sm w-full max-w-xs relative">
             {user?.avatarUrl ? (
               <img src={user.avatarUrl} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
             ) : (
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-700 text-lg">
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-lg">
                 {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}
               </div>
             )}
             <div className="flex-1 min-w-0 ml-3">
-              <div className="font-bold text-[#283F83] leading-tight truncate">{user?.username || 'Admin User'}</div>
-              <div className="text-xs text-blue-500 truncate">{user?.role || 'No role available'}</div>
+              <div className="font-bold text-foreground leading-tight truncate">{user?.username || 'Admin User'}</div>
+              <div className="text-xs text-muted-foreground truncate">{user?.role || 'No role available'}</div>
             </div>
             {onLogout && (
-              <button onClick={onLogout} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-blue-50 transition-colors" title="Logout">
-                <LogOut className="w-5 h-5 text-blue-500" />
+              <button onClick={onLogout} className="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-accent transition-colors" title="Logout">
+                <LogOut className="w-5 h-5 text-muted-foreground" />
               </button>
             )}
           </div>

@@ -41,7 +41,7 @@ export function RecentlyPlayed() {
           {recentSongs.map((song) => (
             <Card
               key={song.id}
-              className="group border-border/50 hover:shadow-lg transition-all cursor-pointer overflow-hidden"
+              className="group border-border/50 hover:shadow-primary transition-all cursor-pointer overflow-hidden"
             >
               <CardContent className="p-4">
                 <div className="relative mb-3">
@@ -56,7 +56,7 @@ export function RecentlyPlayed() {
                   </div>
                   <Button
                     size="icon"
-                    className="absolute bottom-2 right-2 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg bg-[linear-gradient(to_right,var(--primary),var(--secondary))]"
+                    className="absolute bottom-2 right-2 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-primary bg-gradient-primary"
                   >
                     <Play className="w-4 h-4 ml-0.5 fill-white" />
                   </Button>

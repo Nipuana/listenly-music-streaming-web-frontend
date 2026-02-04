@@ -44,7 +44,7 @@ export default async function Header() {
               <Button asChild variant="ghost" size="sm" className="text-primary hover:bg-accent">
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild size="sm" className="bg-[linear-gradient(to_right,var(--primary),var(--secondary))] text-white hover:opacity-90">
+              <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground hover:opacity-90">
                 <Link href="/register">Sign Up</Link>
               </Button>
             </>

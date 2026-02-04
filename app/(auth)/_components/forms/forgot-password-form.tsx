@@ -37,15 +37,15 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-background p-6">
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-linear-to-br from-primary to-secondary shadow-lg">
-              <Music className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/10 shadow-lg border border-primary/20">
+              <Music className="w-8 h-8 text-primary" />
             </div>
-            <span className="text-3xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="text-3xl font-bold bg-(--gradient-primary) bg-clip-text text-gradient-primary">
               Listenly
             </span>
           </div>
@@ -53,7 +53,7 @@ export default function ForgotPasswordForm() {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100">
+        <div className="bg-card rounded-3xl shadow-2xl p-8 md:p-10 border border-border">
           {!success ? (
             <>
               <h1 className="text-2xl font-bold text-foreground mb-2 text-center">
@@ -77,7 +77,7 @@ export default function ForgotPasswordForm() {
                       type="email"
                       placeholder="name@example.com"
                       className={`pl-12 h-12 rounded-xl border-2 ${
-                        errors.email ? "border-error focus:border-error" : "border-gray-200 focus:border-secondary"
+                        errors.email ? "border-error focus:border-error" : "border-border focus:border-secondary"
                       }`}
                       {...register("email")}
                       autoComplete="email"
@@ -90,7 +90,7 @@ export default function ForgotPasswordForm() {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 bg-linear-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary-hover text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+                  className="w-full h-12 bg-gradient-primary hover:bg-gradient-primary text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? "Sending..." : "Send Reset Link"}
@@ -110,8 +110,8 @@ export default function ForgotPasswordForm() {
           ) : (
             <div className="text-center py-4">
               {/* Success Icon */}
-              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+              <div className="w-20 h-20 bg-success-light rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
@@ -131,7 +131,7 @@ export default function ForgotPasswordForm() {
               </p>
 
               {/* Info Box */}
-              <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-left">
+              <div className="bg-info-light border border-info/30 rounded-xl p-4 mb-6 text-left">
                 <p className="text-primary font-semibold text-sm mb-1">
                   Didn't receive the email?
                 </p>
@@ -145,7 +145,7 @@ export default function ForgotPasswordForm() {
                 <Button 
                   onClick={() => setSuccess(false)}
                   variant="outline"
-                  className="w-full h-12 border-2 border-secondary text-secondary hover:bg-secondary hover:text-white font-semibold rounded-xl transition-all duration-200"
+                  className="w-full h-12 border-2 border-secondary text-secondary hover:bg-secondary hover:text-secondary-foreground font-semibold rounded-xl transition-all duration-200"
                 >
                   Try Another Email
                 </Button>
