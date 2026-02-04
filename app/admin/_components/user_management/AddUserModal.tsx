@@ -108,7 +108,6 @@ export default function AddUserModal({ open, onClose, onSave }: AddUserModalProp
               <option value="user">User</option>
               <option value="pUser">Premium User</option>
               <option value="artist">Artist</option>
-              <option value="admin">Admin</option>
             </select>
           </div>
 

@@ -95,7 +95,6 @@ export default function UserEditModal({ user, open, onClose, onSave }: UserEditM
                   <option value="user">User</option>
                   <option value="pUser">Premium User</option>
                   <option value="artist">Artist</option>
-                  <option value="admin">Admin</option>
                 </select>
               </div>
             </div>
