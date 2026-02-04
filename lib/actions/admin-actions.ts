@@ -1,7 +1,7 @@
 // Server side processing of admin actions
 "use server";
 import { revalidatePath } from "next/cache";
-import { getAllUsers, getUserById, createUser, updateUser, deleteUser } from "../api/api-calls/ad-users";
+import { getAllUsers, getUserById, createUser, updateUser, deleteUser } from "../api/api-calls/admin_APIs/ad-users";
 
 // Get all users
 export const handleGetAllUsers = async () => {
