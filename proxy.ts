@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAuthToken, getUserData } from "./lib/cookie";
+import { getAuthToken, getUserData } from "./lib/cookies/user-data-cookies";
 
 const publicPaths = ['/login', '/register', '/forget-password', '/'];
 const adminPrefix = '/admin';

@@ -1,7 +1,7 @@
 import { Music, User, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { getAuthToken, getUserData, clearAuthCookies } from "@/lib/cookie";
+import { getAuthToken, getUserData, clearAuthCookies } from "@/lib/cookies/user-data-cookies";
 import {
   DropdownMenu,
   DropdownMenuContent,

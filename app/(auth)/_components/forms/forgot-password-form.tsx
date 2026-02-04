@@ -7,7 +7,7 @@ import { Button } from "../../../../components/ui/button";
 import { Input } from "../../../../components/ui/input";
 import { useState } from "react";
 import { ForgotPasswordFormValues, forgotPasswordSchema } from "@/app/(auth)/utils/forgotPasswordSchema";
-import { requestPasswordReset } from "@/lib/api/api-calls/auth";
+import { requestPasswordReset } from "@/lib/api/api-calls/user_APIs/auth_APIs/auth";
 import { toast } from "react-toastify";
 
 export default function ForgotPasswordForm() {
