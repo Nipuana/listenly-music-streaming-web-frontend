@@ -25,5 +25,24 @@ export const API = {
     CLEAR_INFO: '/api/userInfo/clear-info',
   },
 
-  
+  SONGS: {
+    GET_ALL: '/api/songs/get-all-songs',
+    GET_MY_SONGS: '/api/songs/user/my-songs',
+    GET_BY_USER: (userId: string) => `/api/songs/getSongByuserId/${userId}`,
+    GET_BY_GENRE: (genre: string) => `/api/songs/getSongsBygenre/${genre}`,
+    GET_BY_ID: (id: string) => `/api/songs/getSongById/${id}`,
+    PLAY_COUNT: (id: string) => `/api/songs/play-count/${id}`,
+    LISTEN_TIME: (id: string) => `/api/songs/listen-time/${id}`,
+    CREATE: '/api/songs/create-song',
+    UPDATE: (id: string) => `/api/songs/update-song/${id}`,
+    DELETE: (id: string) => `/api/songs/del-song/${id}`,
+  },
+
+  SONG_LIKES: {
+    GET_LIKED: '/api/songs/user/liked-songs',
+    LIKE_STATUS: (id: string) => `/api/songs/like-status/${id}/liked`,
+    TOGGLE_LIKE: (id: string) => `/api/songs/change-like-status/${id}`,
+  },
+
+
 };
