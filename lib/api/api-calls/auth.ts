@@ -42,7 +42,7 @@ export const login = async ( loginData : any ) => {
  export const getProfile= async() =>{
         try{
             const response = await axios.get(
-                API.AUTH.GETPROFILE, 
+                API.AUTH.GET_PROFILE, 
             );
             return response.data; 
         }catch (err: Error | any) {
@@ -57,7 +57,7 @@ export const login = async ( loginData : any ) => {
 export const updateProfile= async (updateData: any) => {
     try {
         const response=await axios.put(
-            API.AUTH.UPDATEPROFILE,
+            API.AUTH.UPDATE_PROFILE,
             updateData,
             {
                 headers:{
