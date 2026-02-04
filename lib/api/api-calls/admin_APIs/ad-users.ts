@@ -1,8 +1,8 @@
 // API layer for admin user management
 // Call api from backend
 
-import axios from "../axios";
-import { API } from "../endpoints";
+import axios from "../../axios";
+import { API } from "../../endpoints";
 
 // Helper function to handle API errors
 function handleApiError(err: any, defaultMessage: string): never {

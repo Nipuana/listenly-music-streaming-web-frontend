@@ -1,8 +1,8 @@
 // server side processing of both actions
 "use server";
 import { revalidatePath } from "next/cache";
-import { login, register,getProfile, updateProfile } from "../api/api-calls/auth";
-import { setUserData } from "../cookie";
+import { login, register,getProfile, updateProfile, requestPasswordReset, resetPassword } from "../api/api-calls/user_APIs/auth_APIs/auth";
+import { setUserData } from "../cookies/user-data-cookies";
 import { success } from "zod";
 
 export const handleRegister = async (formData: any) => {
@@ -98,6 +98,48 @@ export const handleUpdateData= async (formData: any) => {
         return {
             success:false,
             message: err.message || "Updating profile failed"
+        };
+    }
+}
+
+export const handleRequestPasswordReset = async (email: string) => {
+    try {
+        const result = await requestPasswordReset(email);
+        if (result.success) {
+            return {
+                success: true,
+                message: "Password reset link sent successfully",
+            };
+        }
+        return {
+            success: false,
+            message: result.message || "Failed to send reset link"
+        };
+    } catch (err: Error | any) {
+        return {
+            success: false,
+            message: err.message || "Failed to send reset link"
+        };
+    }
+}
+
+export const handleResetPassword = async (token: string, newPassword: string) => {
+    try {
+        const result = await resetPassword(token, newPassword);
+        if (result.success) {
+            return {
+                success: true,
+                message: "Password reset successfully",
+            };
+        }
+        return {
+            success: false,
+            message: result.message || "Failed to reset password"
+        };
+    } catch (err: Error | any) {
+        return {
+            success: false,
+            message: err.message || "Failed to reset password"
         };
     }
 }
