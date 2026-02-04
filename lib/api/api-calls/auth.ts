@@ -1,8 +1,8 @@
 // API layer
 // Call api from backend
 
-import axios from "./axios";
-import { API } from "./endpoints";
+import axios from "../axios";
+import { API } from "../endpoints";
 
 export const register = async ( registerData : any ) => {
     try{
@@ -37,6 +37,41 @@ export const login = async ( loginData : any ) => {
              || "Login failed" //fallback message if default fails
         );
     };
-    
+   
+}
+ export const getProfile= async() =>{
+        try{
+            const response = await axios.get(
+                API.AUTH.GETPROFILE, 
+            );
+            return response.data; 
+        }catch (err: Error | any) {
+            throw new Error(
+                err.response?.data?.message 
+                 || err.message 
+                 || "Fetching profile failed" 
+            );
+        }
+    }
 
+export const updateProfile= async (updateData: any) => {
+    try {
+        const response=await axios.put(
+            API.AUTH.UPDATEPROFILE,
+            updateData,
+            {
+                headers:{
+                    "Content-Type":'multipart/form-data'
+                }
+                    
+            }
+        )
+        return response.data;
+    }catch(err: Error | any){
+        throw new Error(
+            err.response?.data?.message 
+            || err.message  
+            || "Failed to update profile" 
+        );
+    }
 }
