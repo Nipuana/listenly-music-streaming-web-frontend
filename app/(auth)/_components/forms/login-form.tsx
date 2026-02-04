@@ -12,7 +12,7 @@ import { Checkbox } from "../../../../components/ui/checkbox";
 import { useState } from "react";
 import { handleLogin } from "@/lib/actions/auth-acitons";
 import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
-import { setAuthToken, setUserData } from "@/lib/cookies/user-data-cookies";
+import { setAuthToken, setUserData } from "@/lib/cookies/user-data-cookie";
 import { login } from "@/lib/api/api-calls/user_APIs/auth_APIs/auth";
 import { useAuth } from "@/app/(auth)/context/auth-context";
 
