@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Users, ShieldCheck, Mic2, Crown } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,23 +13,26 @@ interface AddUserModalProps {
 
 export default function AddUserModal({ open, onClose, onSave }: AddUserModalProps) {
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
-    role: "user",
+    confirmPassword: "",
+    role: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   if (!open) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formData);
-    // Reset form
     setFormData({
-      name: "",
+      username: "",
       email: "",
       password: "",
-      role: "user",
+      confirmPassword: "",
+      role: "",
     });
   };
 
@@ -41,69 +44,99 @@ export default function AddUserModal({ open, onClose, onSave }: AddUserModalProp
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={onClose}>
-      <div className="bg-card rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-border overflow-hidden" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between px-8 pt-8 pb-4 border-b border-border bg-muted/40">
-          <h3 className="text-2xl font-bold text-foreground">Add New User</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-2xl px-2 py-1 rounded-lg hover:bg-accent transition-colors">&times;</button>
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-6 px-8 py-8">
-          <div className="space-y-6">
-            <div>
-              <Label htmlFor="name" className="font-semibold">Full Name <span className="text-destructive">*</span></Label>
-              <Input
-                id="name"
-                name="name"
-                type="text"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                placeholder="Enter full name"
-                className="mt-2 bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-base shadow-sm"
-              />
-            </div>
-            <div>
-              <Label htmlFor="email" className="font-semibold">Email Address <span className="text-destructive">*</span></Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                placeholder="Enter email address"
-                className="mt-2 bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-base shadow-sm"
-              />
-            </div>
-            <div>
-              <Label htmlFor="password" className="font-semibold">Password <span className="text-destructive">*</span></Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                minLength={6}
-                placeholder="Enter password (min 6 characters)"
-                className="mt-2 bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-base shadow-sm"
-              />
-            </div>
-            <div>
-              <Label htmlFor="role" className="font-semibold">Role <span className="text-destructive">*</span></Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger id="role" className="mt-2 bg-background border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-base shadow-sm">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="user">User</SelectItem>
-                  <SelectItem value="pUser">Premium User</SelectItem>
-                  <SelectItem value="artist">Artist</SelectItem>
-                </SelectContent>
-              </Select>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+      <div className="bg-white dark:bg-background rounded-3xl shadow-2xl max-w-lg w-full mx-4 border border-border overflow-hidden" onClick={e => e.stopPropagation()}>
+        <form onSubmit={handleSubmit} className="px-10 py-12 space-y-10">
+          <div>
+            <h2 className="text-3xl font-bold text-foreground mb-2 tracking-tight">Add User</h2>
+            <p className="text-muted-foreground mb-8">Create a new user account with full credentials</p>
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="username" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Username</Label>
+                <Input
+                  id="username"
+                  name="username"
+                  type="text"
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter username"
+                  className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm focus:ring-2 focus:ring-primary/30"
+                />
+              </div>
+              <div>
+                <Label htmlFor="role" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Role</Label>
+                <Select value={formData.role} onValueChange={value => setFormData({ ...formData, role: value })}>
+                  <SelectTrigger id="role" className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm w-full focus:ring-2 focus:ring-primary/30">
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                    <SelectContent className="w-full min-w-55 bg-white dark:bg-background border-none rounded-xl shadow-lg">
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="artist">Artist</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="relative">
+                <Label htmlFor="password" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Password</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter password"
+                  className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm focus:ring-2 focus:ring-primary/30 pr-12"
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-4 top-9 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword(v => !v)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <div className="relative">
+                <Label htmlFor="confirmPassword" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  placeholder="Re-enter password"
+                  className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm focus:ring-2 focus:ring-primary/30 pr-12"
+                />
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  className="absolute right-4 top-9 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowConfirmPassword(v => !v)}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+              <div>
+                <Label htmlFor="role" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">User Role</Label>
+                <Select value={formData.role} onValueChange={value => setFormData({ ...formData, role: value })}>
+                  <SelectTrigger id="role" className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm w-full focus:ring-2 focus:ring-primary/30">
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                  <SelectContent className="w-full min-w-55">
+                    <SelectItem value="user">User</SelectItem>
+                    <SelectItem value="pUser">Premium User</SelectItem>
+                    <SelectItem value="artist">Artist</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-          <div className="flex gap-3 pt-6">
+          <div className="flex gap-4 pt-2">
             <Button
               type="button"
               onClick={onClose}
@@ -114,7 +147,7 @@ export default function AddUserModal({ open, onClose, onSave }: AddUserModalProp
             </Button>
             <Button
               type="submit"
-              className="flex-1 font-semibold py-3 text-base"
+              className="flex-1 font-semibold py-3 text-base bg-primary text-primary-foreground hover:bg-primary/90"
             >
               Create User
             </Button>

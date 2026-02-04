@@ -45,6 +45,8 @@
   --success: #10B981;
   --warning: #F59E0B;
   --error: #EF4444;
+  --destructive: var(--error);
+  --destructive-foreground: #FFFFFF;
   --info: var(--brand-bright);
 
   /* Light variations for backgrounds */
@@ -205,3 +207,17 @@
 .shadow-primary {
   box-shadow: var(--shadow-primary);
 }
+
+/* Ensure destructive buttons are visible and accessible in light mode */
+html:not(.dark) .btn-destructive,
+html:not(.dark) button.bg-destructive {
+  color: var(--destructive) !important;
+  border-color: var(--destructive) !important;
+  background-color: var(--background-secondary) !important;
+}
+html:not(.dark) .btn-destructive:hover,
+html:not(.dark) button.bg-destructive:hover {
+  color: var(--destructive-foreground) !important;
+  background-color: var(--destructive) !important;
+}
+

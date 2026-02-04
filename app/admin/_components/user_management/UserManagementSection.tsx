@@ -130,7 +130,7 @@ export default function UserManagementSection() {
       if (result.success) {
         setUsers([...users, result.data]);
         setAddOpen(false);
-        toast.success(`${userData.name} has been created successfully`, {
+        toast.success(`${userData.username} has been created successfully`, {
           autoClose: 3000,
         });
       } else {
@@ -255,8 +255,8 @@ export default function UserManagementSection() {
             onClick={() => setRoleFilter('admin')}
             className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
               roleFilter === 'admin'
-                ? 'bg-secondary text-secondary-foreground shadow-primary'
-                : 'text-muted-foreground hover:text-secondary hover:bg-secondary/10'
+                ? 'bg-primary text-primary-foreground shadow-primary'
+                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
             }`}
           >
             <span className="flex items-center justify-center gap-2">

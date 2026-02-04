@@ -31,12 +31,18 @@ export default function AdminDashboardScreen() {
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} />
         {showLogoutConfirm && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-card rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-4 border border-border">
+            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-card rounded-3xl shadow-2xl p-10 max-w-sm w-full mx-4 border border-border">
               <h3 className="text-2xl font-bold mb-2 text-foreground">Confirm Logout</h3>
               <p className="mb-6 text-muted-foreground">Are you sure you want to log out?</p>
-              <div className="flex gap-3 w-full justify-end">
-                <button onClick={() => setShowLogoutConfirm(false)} className="flex-1 px-5 py-2.5 rounded-xl border border-border bg-background hover:bg-accent hover:text-accent-foreground text-foreground font-semibold transition-all">Cancel</button>
-                <Button onClick={confirmLogout} variant="destructive" className="flex-1">Logout</Button>
+              <div className="flex gap-3 w-full">
+                <Button onClick={() => setShowLogoutConfirm(false)} variant="outline" className="flex-1 font-semibold">Cancel</Button>
+                <Button
+                  onClick={confirmLogout}
+                  variant="destructive"
+                  className="flex-1 font-semibold border border-destructive text-destructive bg-white hover:bg-destructive hover:text-white shadow-sm hover:shadow-md"
+                >
+                  Logout
+                </Button>
               </div>
             </motion.div>
           </motion.div>
