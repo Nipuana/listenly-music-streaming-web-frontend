@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { LayoutDashboard, Users, Mic2, Music, DollarSign, MessageSquare, Sun, LogOut, Music2, Shield } from "lucide-react";
+import { LayoutDashboard, Users, Mic2, Music, DollarSign, MessageSquare, Sun, Moon, LogOut, Music2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useThemeToggle } from "@/hooks/use-theme-toggle";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -64,6 +65,12 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTab, setActiveTab, user, onLogout }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const { toggleTheme, isDark, mounted } = useThemeToggle();
+
+  const handleThemeClick = () => {
+    toggleTheme();
+  };
+
   return (
     <aside className={`bg-white/80 backdrop-blur-xl border-r border-blue-100 h-screen sticky top-0 hidden lg:flex flex-col transition-all duration-300 ${collapsed ? 'w-24 p-4' : 'w-72 p-6'}`}>
       <div className="flex items-center justify-center mb-10">
@@ -100,7 +107,13 @@ export default function Sidebar({ activeTab, setActiveTab, user, onLogout }: Sid
         <SidebarItem icon={<MessageSquare size={20} />} label="Support & Feedback" active={activeTab === "feedback"} onClick={() => setActiveTab("feedback")} collapsed={collapsed} />
         <div className="pt-8">
           {!collapsed && <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">System</p>}
-          <SidebarItem icon={<Sun size={20} />} label="Theme Toggle" active={activeTab === "theme"} onClick={() => setActiveTab("theme")} collapsed={collapsed} />
+          <SidebarItem 
+            icon={mounted ? (isDark ? <Moon size={20} /> : <Sun size={20} />) : <Sun size={20} />} 
+            label={mounted ? (isDark ? "Dark Mode" : "Light Mode") : "Theme Toggle"} 
+            active={false} 
+            onClick={handleThemeClick} 
+            collapsed={collapsed} 
+          />
           <SidebarItem icon={<Shield size={20} />} label="Security Logs" active={activeTab === "security"} onClick={() => setActiveTab("security")} collapsed={collapsed} />
         </div>
       </nav>
