@@ -44,5 +44,21 @@ export const API = {
     TOGGLE_LIKE: (id: string) => `/api/songs/change-like-status/${id}`,
   },
 
+  PLAYLISTS: {
+    GET_ALL: '/api/playlists/',
+    GET_MY: '/api/playlists/user/my-playlists',
+    GET_BY_ID: (id: string) => `/api/playlists/${id}`,
+    CREATE: '/api/playlists/',
+    UPDATE: (id: string) => `/api/playlists/${id}`,
+    DELETE: (id: string) => `/api/playlists/${id}`,
+    ADD_SONG: (id: string) => `/api/playlists/${id}/songs`,
+    REMOVE_SONG: (id: string, songId: string) => `/api/playlists/${id}/songs/${songId}`,
+    REORDER_SONGS: (id: string) => `/api/playlists/${id}/songs/reorder`,
+  },
 
+  PLAYLIST_FAVORITES: {
+    GET_FAVORITED: '/api/playlists/user/favorited',
+    FAVORITE_STATUS: (id: string) => `/api/playlists/${id}/favorited`,
+    TOGGLE_FAVORITE: (id: string) => `/api/playlists/${id}/favorite`,
+  },
 };
