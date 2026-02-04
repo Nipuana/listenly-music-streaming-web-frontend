@@ -4,10 +4,12 @@ import { Trash2, Users, ShieldCheck, Mic2, Crown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { handleGetAllUsers, handleUpdateUser, handleDeleteUser, handleCreateUser } from "@/lib/actions/admin-actions";
-import UserEditModal from "./UserEditModal";
-import DeleteConfirmModal from "./DeleteConfirmModal";
-import UserProfileModal from "./UserProfileModal";
-import AddUserModal from "./AddUserModal";
+import UserEditModal from "./popup_modals/UserEditModal";
+import DeleteConfirmModal from "./popup_modals/DeleteConfirmModal";
+import UserProfileModal from "./popup_modals/UserProfileModal";
+import AddUserModal from "./popup_modals/AddUserModal";
+import SearchFilter from "./displayed-content/SearchFilter";
+import DisplayedPagination from "./displayed-content/DisplayedPagination";
 
 // Helper function to get initials from name
 const getInitials = (name: string) => {
@@ -208,78 +210,15 @@ export default function UserManagementSection() {
           </Button>
         </div>
 
-        {/* Search Bar */}
-        <div className="mb-4">
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground w-5 h-5" />
-            <Input
-              type="text"
-              placeholder="Search by name or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12"
-            />
-          </div>
-        </div>
+        
+        <SearchFilter
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          roleFilter={roleFilter}
+          setRoleFilter={setRoleFilter}
+          roleCounts={roleCounts}
+        />
 
-        {/* Filter Bar */}
-        <div className="flex gap-2 mb-6 p-2 bg-muted rounded-xl">
-          <button
-            onClick={() => setRoleFilter('all')}
-            className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              roleFilter === 'all'
-                ? 'bg-primary text-primary-foreground shadow-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-primary/10'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              All Users
-              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.all}</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setRoleFilter('user')}
-            className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              roleFilter === 'user'
-                ? 'bg-primary text-primary-foreground shadow-primary'
-                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              <Users className="w-4 h-4" />
-              Users
-              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.user}</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setRoleFilter('admin')}
-            className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              roleFilter === 'admin'
-                ? 'bg-primary text-primary-foreground shadow-primary'
-                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              <ShieldCheck className="w-4 h-4" />
-              Admins
-              <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">{roleCounts.admin}</span>
-            </span>
-          </button>
-          <button
-            onClick={() => setRoleFilter('artist')}
-            className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all ${
-              roleFilter === 'artist'
-                ? 'bg-primary text-primary-foreground shadow-primary'
-                : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
-            }`}
-          >
-            <span className="flex items-center justify-center gap-2">
-              <Mic2 className="w-4 h-4" />
-              Artists
-              <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">{roleCounts.artist}</span>
-            </span>
-          </button>
-        </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-12">
@@ -370,42 +309,15 @@ export default function UserManagementSection() {
         
         {/* Pagination Controls */}
         {!loading && filteredUsers.length > usersPerPage && (
-          <div className="flex items-center justify-between mt-6 px-4">
-            <div className="text-sm text-muted-foreground">
-              Showing {indexOfFirstUser + 1} to {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-primary/10 hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Previous
-              </button>
-              <div className="flex gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-2 rounded-lg font-semibold transition-all ${
-                      currentPage === page
-                        ? 'bg-primary text-primary-foreground shadow-primary'
-                        : 'bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-lg bg-muted text-muted-foreground font-semibold hover:bg-primary/10 hover:text-primary transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <DisplayedPagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            indexOfFirstUser={indexOfFirstUser}
+            indexOfLastUser={indexOfLastUser}
+            filteredLength={filteredUsers.length}
+            usersPerPage={usersPerPage}
+          />
         )}
       </div>
       
