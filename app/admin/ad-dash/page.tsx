@@ -1,7 +1,5 @@
 
-import dynamic from "next/dynamic";
-
-const DashboardScreen = dynamic(() => import("./dashboard-screen"));
+import DashboardScreen from "./dashboard-screen";
 
 export default function AdminDashboardPage() {
 	return <DashboardScreen />;
