@@ -24,7 +24,7 @@ const playlists = [
   },
 ];
 
-export function YourPlaylists() {
+export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
       <CardHeader>
@@ -36,7 +36,11 @@ export function YourPlaylists() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className={`grid gap-4 ${
+          collapsed
+            ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-5' // More columns when collapsed
+            : 'grid-cols-1 md:grid-cols-3' // Normal columns when expanded
+        }`}>
           {playlists.map((playlist) => (
             <Link key={playlist.id} href={`/user/playlist/${playlist.id}`}>
               <Card className="border-border/50 hover:shadow-primary transition-all cursor-pointer">

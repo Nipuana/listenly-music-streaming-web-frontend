@@ -30,14 +30,18 @@ const recentSongs = [
   },
 ];
 
-export function RecentlyPlayed() {
+export function RecentlyPlayed({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
       <CardHeader>
         <CardTitle>Recently Played</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className={`grid gap-4 ${
+          collapsed
+            ? 'grid-cols-3 md:grid-cols-5 lg:grid-cols-6' // More columns when collapsed
+            : 'grid-cols-2 md:grid-cols-4' // Normal columns when expanded
+        }`}>
           {recentSongs.map((song) => (
             <Card
               key={song.id}
