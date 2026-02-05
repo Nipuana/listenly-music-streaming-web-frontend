@@ -45,10 +45,10 @@ export default function LoginForm() {
         await checkAuth();
         // Check the user's role and navigate accordingly
         if (result.data && result.data.role === "user") {
-          router.push("/user/dashboard");
+          router.replace("/user/dashboard");
         } 
         if(result.data && result.data.role=="admin") {
-          router.push("/admin/ad-dash");
+          router.replace("/admin/ad-dash");
         }
       } else {
         throw new Error(result.message || "Login failed due to role issue contact support");
