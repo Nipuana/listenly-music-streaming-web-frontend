@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
@@ -36,7 +36,7 @@ export default function RootLayout({
         >
           <AuthProvider>
             {children}
-            <ToastContainer position="top-right"/>
+            <ToastContainer position="top-right" />
           </AuthProvider>
         </ThemeProvider>
       </body>
