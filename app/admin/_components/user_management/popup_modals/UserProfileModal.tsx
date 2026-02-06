@@ -1,5 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { getFullImageUrl } from "@/lib/utils/image-util";
 
 // Helper function to get initials from name
 const getInitials = (name: string) => {
@@ -46,8 +47,8 @@ export default function UserProfileModal({ user, open, onClose, onEdit, onDelete
         <div className="space-y-6">
           {/* Avatar and Basic Info */}
           <div className="flex items-center gap-4 pb-6 border-b border-border">
-            {user.avatar ? (
-              <img src={user.avatar} alt={user.name} className="w-20 h-20 rounded-full object-cover border-4 border-primary/20" />
+            {user.profilePicture ? (
+              <img src={getFullImageUrl(user.profilePicture) || ""} alt={user.name} className="w-20 h-20 rounded-full object-cover border-4 border-primary/20" />
             ) : (
               <div className="w-20 h-20 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-xl border-4 border-primary/20">
                 {getInitials(user.name || user.email)}
@@ -62,27 +63,26 @@ export default function UserProfileModal({ user, open, onClose, onEdit, onDelete
             </div>
           </div>
 
-          {/* Detailed Information */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-muted p-4 rounded-xl col-span-2">
+            <div className="bg-background border border-border p-4 rounded-xl shadow-sm col-span-2">
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">MongoDB ID</p>
               <p className="text-sm font-mono text-foreground break-all">{user._id || user.id || 'N/A'}</p>
             </div>
-            <div className="bg-muted p-4 rounded-xl">
+            <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Role</p>
               <p className="text-sm font-semibold text-foreground">{user.role || 'User'}</p>
             </div>
-            <div className="bg-muted p-4 rounded-xl">
+            <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Plan</p>
               <p className="text-sm font-semibold text-foreground">{user.plan || 'Free Tier'}</p>
             </div>
-            <div className="bg-muted p-4 rounded-xl">
+            <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Join Date</p>
               <p className="text-sm font-semibold text-foreground">
                 {user.joinDate || user.createdAt || user.created_at ? new Date(user.joinDate || user.createdAt || user.created_at).toLocaleDateString() : 'N/A'}
               </p>
             </div>
-            <div className="bg-muted p-4 rounded-xl">
+            <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Last Updated</p>
               <p className="text-sm font-semibold text-foreground">
                 {user.updatedAt || user.updated_at ? new Date(user.updatedAt || user.updated_at).toLocaleDateString() : 'N/A'}
@@ -96,19 +96,19 @@ export default function UserProfileModal({ user, open, onClose, onEdit, onDelete
               <h4 className="text-lg font-semibold text-foreground mb-3">Additional Information</h4>
               <div className="grid grid-cols-2 gap-4">
                 {(user.additionalInfo?.phoneNumber || user.phone) && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Phone</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo?.phoneNumber || user.phone}</p>
                   </div>
                 )}
                 {user.additionalInfo?.gender && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Gender</p>
                     <p className="text-sm font-semibold text-foreground capitalize">{user.additionalInfo.gender}</p>
                   </div>
                 )}
                 {user.additionalInfo?.dateOfBirth && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Date of Birth</p>
                     <p className="text-sm font-semibold text-foreground">
                       {new Date(user.additionalInfo.dateOfBirth).toLocaleDateString()}
@@ -116,37 +116,37 @@ export default function UserProfileModal({ user, open, onClose, onEdit, onDelete
                   </div>
                 )}
                 {user.additionalInfo?.age && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Age</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo.age} years</p>
                   </div>
                 )}
                 {user.additionalInfo?.address && (
-                  <div className="bg-muted p-4 rounded-xl col-span-2">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm col-span-2">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Address</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo.address}</p>
                   </div>
                 )}
                 {user.additionalInfo?.city && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">City</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo.city}</p>
                   </div>
                 )}
                 {(user.additionalInfo?.country || user.country) && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Country</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo?.country || user.country}</p>
                   </div>
                 )}
                 {user.additionalInfo?.postalCode && (
-                  <div className="bg-muted p-4 rounded-xl">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Postal Code</p>
                     <p className="text-sm font-semibold text-foreground">{user.additionalInfo.postalCode}</p>
                   </div>
                 )}
                 {(user.additionalInfo?.bio || user.bio) && (
-                  <div className="bg-muted p-4 rounded-xl col-span-2">
+                  <div className="bg-background border border-border p-4 rounded-xl shadow-sm col-span-2">
                     <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Bio</p>
                     <p className="text-sm text-foreground">{user.additionalInfo?.bio || user.bio}</p>
                   </div>
