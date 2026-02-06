@@ -1,18 +1,31 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAuth } from "@/app/(auth)/context/auth-context";
+import { useAuth } from "@/Providers/Contexts/auth-context";
 import Sidebar from "@/components/layout/sidebar/sidebar";
-import { SidebarProvider, useSidebarState } from "@/components/layout/sidebar/SidebarContext";
+import { SidebarProvider, useSidebarState } from "@/Providers/Contexts/SidebarContext";
 import UserManagementSection from "../_components/user_management/UserManagementSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { motion } from "framer-motion";
 import { Users, Mic2, DollarSign, Search, Bell, TrendingUp, Play } from "lucide-react";
+import { motion } from "framer-motion";
 
+
+const contentVariants = {
+  expanded: { marginLeft: 256 },
+  collapsed: { marginLeft: 64 }
+};
 
 export default function AdminDashboardScreen() {
+  return (
+    <SidebarProvider>
+      <InnerDashboard />
+    </SidebarProvider>
+  );
+}
+
+function InnerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -38,76 +51,65 @@ export default function AdminDashboardScreen() {
 
   if (isLoading) {
     return (
-      <SidebarProvider>
-        <div className="min-h-screen bg-background font-sans text-foreground">
-          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} />
-          <main className={`ml-0 ${collapsed ? 'lg:ml-16' : 'lg:ml-72 xl:ml-72'} p-app-gutter md:p-app-gutter-md min-h-screen flex items-center justify-center`}>
+      <div className="min-h-screen bg-background font-sans text-foreground">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} />
+        <motion.div 
+          variants={contentVariants}
+          initial="expanded"
+          animate={collapsed ? "collapsed" : "expanded"}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className=""
+        >
+          <main className="p-6 md:p-8 lg:p-10 xl:p-12 min-h-screen flex items-center justify-center">
             <div className="text-center space-y-4">
               <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
               <p className="text-muted-foreground">Loading dashboard...</p>
             </div>
           </main>
-        </div>
-      </SidebarProvider>
+        </motion.div>
+      </div>
     );
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background font-sans text-foreground">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} mode="admin" />
-        {showLogoutConfirm && (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-white dark:bg-card rounded-3xl shadow-2xl p-10 max-w-sm w-full mx-4 border border-border">
-              <h3 className="text-2xl font-bold mb-2 text-foreground">Confirm Logout</h3>
-              <p className="mb-6 text-muted-foreground">Are you sure you want to log out?</p>
-              <div className="flex gap-3 w-full">
-                <Button onClick={() => setShowLogoutConfirm(false)} variant="outline" className="flex-1 font-semibold">Cancel</Button>
-                <Button
-                  onClick={confirmLogout}
-                  variant="destructive"
-                  className="flex-1 font-semibold border border-destructive text-destructive bg-white hover:bg-destructive hover:text-white shadow-sm hover:shadow-md"
-                >
-                  Logout
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+    <div className="min-h-screen bg-background font-sans text-foreground">
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} mode="admin" />
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white dark:bg-card rounded-3xl shadow-2xl p-10 max-w-sm w-full mx-4 border border-border">
+            <h3 className="text-2xl font-bold mb-2 text-foreground">Confirm Logout</h3>
+            <p className="mb-6 text-muted-foreground">Are you sure you want to log out?</p>
+            <div className="flex gap-3 w-full">
+              <Button onClick={() => setShowLogoutConfirm(false)} variant="outline" className="flex-1 font-semibold">Cancel</Button>
+              <Button
+                onClick={confirmLogout}
+                variant="destructive"
+                className="flex-1 font-semibold border border-destructive text-destructive bg-white hover:bg-destructive hover:text-white shadow-sm hover:shadow-md"
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+      <motion.div 
+        variants={contentVariants}
+        initial="expanded"
+        animate={collapsed ? "collapsed" : "expanded"}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className=""
+      >
         <MainContent activeTab={activeTab} />
-      </div>
-    </SidebarProvider>
+      </motion.div>
+    </div>
   );
 }
 
 function MainContent({ activeTab }: { activeTab: string }) {
-  const { collapsed } = useSidebarState();
-
   return (
-    <motion.main
-      className={`min-h-screen transition-all duration-300 ${
-        collapsed
-          ? 'p-6 md:p-8 lg:p-10 xl:p-12' // More padding when collapsed
-          : 'p-app-gutter md:p-app-gutter-md' // Normal padding when expanded
-      }`}
-      animate={{
-        marginLeft: collapsed ? 64 : 288, // 16 * 4px = 64px, 72 * 4px = 288px
-      }}
-      transition={{
-        duration: 0.3,
-        ease: [0.4, 0.0, 0.2, 1],
-        type: "tween"
-      }}
-    >
-      <motion.div
-        className={`transition-all duration-300 ${
-          collapsed
-            ? 'max-w-none space-y-10' // Full width and more spacing when collapsed
-            : 'max-w-7xl mx-auto space-y-8' // Centered container when expanded
-        }`}
-        layout
-      >
-      <motion.header initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <main className="min-h-screen p-6 md:p-8 lg:p-10 xl:p-12">
+      <div className="max-w-7xl mx-20 space-y-8">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-1">
             {activeTab === 'overview' && 'System Overview'}
@@ -127,23 +129,13 @@ function MainContent({ activeTab }: { activeTab: string }) {
             <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-destructive rounded-full border border-card"></span>
           </Button>
         </div>
-      </motion.header>
+      </header>
       {/* Render tab content here, e.g. Overview, Users, etc. */}
-      <motion.div
-        key={activeTab}
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -20 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-      >
+      <div>
         {activeTab === 'overview' && (
           <div className="space-y-8">
             {/* Example stats cards */}
-            <div className={`grid gap-6 ${
-              collapsed
-                ? 'grid-cols-1 sm:grid-cols-3 lg:grid-cols-5'
-                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4' 
-            }`}>
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               <StatsCard title="Total Revenue" value="$128,430" trend="+14.2%" trendUp={true} icon={<DollarSign className="text-primary-foreground" />} color="bg-primary" />
               <StatsCard title="Active Users" value="42,560" trend="+8.1%" trendUp={true} icon={<Users className="text-primary-foreground" />} color="bg-secondary" />
               <StatsCard title="Total Streams" value="1.2M" trend="+24.5%" trendUp={true} icon={<Play className="text-primary-foreground" />} color="bg-accent" />
@@ -189,10 +181,10 @@ function MainContent({ activeTab }: { activeTab: string }) {
             <p className="text-muted-foreground text-lg">Security Logs section coming soon...</p>
           </div>
         )}
-      </motion.div>
+      </div>
       {/* Add more tab screens here, e.g. Artists, etc. */}
-    </motion.div>
-    </motion.main>
+    </div>
+    </main>
   );
 }
 
