@@ -10,6 +10,8 @@ import UserProfileModal from "./popup_modals/UserProfileModal";
 import AddUserModal from "./popup_modals/AddUserModal";
 import SearchFilter from "./displayed-content/SearchFilter";
 import DisplayedPagination from "./displayed-content/DisplayedPagination";
+import { useProfilePic } from "@/hooks/media-hooks/get-profile-pic";
+import { getFullImageUrl } from "@/lib/utils/image-util";
 
 // Helper function to get initials from name
 const getInitials = (name: string) => {
@@ -33,6 +35,7 @@ const getRoleBadge = (role: string) => {
 };
 
 export default function UserManagementSection() {
+  const { src, fallback } = useProfilePic();
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState<any>(null);
@@ -198,9 +201,18 @@ export default function UserManagementSection() {
       <h2 className="text-2xl font-bold mb-4 text-foreground">User Management</h2>
       <div className="bg-card rounded-2xl shadow-primary p-6 border border-border">
         <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="text-xl font-bold text-foreground">User Directory</h3>
-            <p className="text-muted-foreground text-sm mt-1">Manage your {users.length} registered users</p>
+          <div className="flex items-center gap-4">
+            {src ? (
+              <img src={src} alt="Your profile" className="w-12 h-12 rounded-full object-cover border-2 border-primary" />
+            ) : (
+              <div className="w-12 h-12 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-lg border-2 border-primary">
+                {fallback}
+              </div>
+            )}
+            <div>
+              <h3 className="text-xl font-bold text-foreground">User Directory</h3>
+              <p className="text-muted-foreground text-sm mt-1">Manage your {users.length} registered users</p>
+            </div>
           </div>
           <Button 
             onClick={() => setAddOpen(true)}
@@ -251,8 +263,8 @@ export default function UserManagementSection() {
                       className="border-b last:border-b-0 hover:bg-primary/5 transition-colors cursor-pointer"
                     >
                       <td className="py-4 px-4">
-                        {user.avatar ? (
-                          <img src={user.avatar} alt={user.name} className="w-11 h-11 rounded-full object-cover border-2 border-border" />
+                        {user.profilePicture ? (
+                          <img src={getFullImageUrl(user.profilePicture)|| ""} alt={user.name} className="w-11 h-11 rounded-full object-cover border-2 border-border" />
                         ) : (
                           <div className="w-11 h-11 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm border-2 border-border">
                             {getInitials(user.name || user.email)}

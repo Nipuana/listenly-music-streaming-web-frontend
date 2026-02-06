@@ -14,7 +14,7 @@ import { handleLogin } from "@/lib/actions/auth-acitons";
 import { LoginFormValues, loginSchema } from "@/app/(auth)/utils/loginSchema";
 import { setAuthToken, setUserData } from "@/lib/cookies/user-data-cookie";
 import { login } from "@/lib/api/api-calls/user_APIs/auth_APIs/auth";
-import { useAuth } from "@/app/(auth)/context/auth-context";
+import { useAuth } from "@/Providers/Contexts/auth-context";
 
 
 
