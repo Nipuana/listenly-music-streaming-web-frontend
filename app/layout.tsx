@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "./(auth)/context/auth-context";
+import { AuthProvider } from "../Providers/Contexts/auth-context";
 import { ToastContainer } from "react-toastify";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider } from "@/Providers/Themes/theme-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,8 +30,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
           disableTransitionOnChange
         >
           <AuthProvider>
