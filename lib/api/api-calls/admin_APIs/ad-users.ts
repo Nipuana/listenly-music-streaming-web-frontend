@@ -32,7 +32,7 @@ export const getAllUsers = async () => {
 // Get user by id
 export const getUserById = async (id: string) => {
     try {
-        const response = await axios.get(`${API.AD_USERS.GET_USER}/${id}`);
+        const response = await axios.get(API.AD_USERS.GET_USER(id));
         return response.data;
     } catch (err: any) {
         handleApiError(err, "Failed to fetch user");
@@ -56,7 +56,7 @@ export const createUser = async (userData: any) => {
 export const updateUser = async (id: string, userData: any) => {
     try {
         const response = await axios.put(
-            `${API.AD_USERS.UPDATE_USER}/${id}`,
+            API.AD_USERS.UPDATE_USER(id),
             userData
         );
         return response.data;
@@ -69,7 +69,7 @@ export const updateUser = async (id: string, userData: any) => {
 export const deleteUser = async (id: string) => {
     try {
         const response = await axios.delete(
-            `${API.AD_USERS.DELETE_USER}/${id}`
+            API.AD_USERS.DELETE_USER(id)
         );
         return response.data;
     } catch (err: any) {

@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { config } from 'zod/v4/core';
 import { getAuthToken } from '../cookies/user-data-cookie';
 
-const Base_URL = process.env.Next_Public_API_BASE_URL
+const Base_URL = process.env.NEXT_PUBLIC_API_BASE_URL
 || 'http://localhost:5000';
 
 const AxiosInstance = axios.create({
