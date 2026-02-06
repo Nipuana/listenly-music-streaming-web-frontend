@@ -2,10 +2,11 @@
 
 import React from "react";
 import { LogOut } from "lucide-react";
+import { getFullImageUrl } from "@/lib/utils/image-util";
 
 interface UserProfileSectionProps {
   collapsed: boolean;
-  user?: { name: string; avatarUrl?: string; role?: string; username?: string; fullName?: string; email?: string };
+  user?: { name: string; profilePicture?: string; role?: string; username?: string; fullName?: string; email?: string };
   onLogout?: () => void;
 }
 
@@ -14,8 +15,8 @@ export default function UserProfileSection({ collapsed, user, onLogout }: UserPr
     <div className="mt-auto flex justify-center">
       {collapsed ? (
         <div className="flex flex-col items-center gap-2">
-          {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt="User Avatar" className="w-10 h-10 rounded-full object-cover" />
+          {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
+            <img src={getFullImageUrl(user.profilePicture) || ""} alt="User Avatar" className="w-10 h-10 rounded-full object-cover" />
           ) : (
             <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-sm">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}
@@ -29,8 +30,8 @@ export default function UserProfileSection({ collapsed, user, onLogout }: UserPr
         </div>
       ) : (
         <div className="flex items-center p-3 rounded-2xl border border-border bg-card/70 shadow-sm w-full max-w-xs relative">
-          {user?.avatarUrl ? (
-            <img src={user.avatarUrl} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
+          {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
+            <img src={getFullImageUrl(user.profilePicture) || ""} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
           ) : (
             <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-lg">
               {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}

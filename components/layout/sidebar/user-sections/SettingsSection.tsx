@@ -2,7 +2,7 @@
 import { Settings, LogOut, MessageSquare } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "../../../../app/(auth)/context/auth-context";
+import { useAuth } from "../../../../Providers/Contexts/auth-context";
 import { usePathname } from "next/navigation";
 
 export function SettingsSection() {
