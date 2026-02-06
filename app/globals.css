@@ -221,3 +221,11 @@ html:not(.dark) button.bg-destructive:hover {
   background-color: var(--destructive) !important;
 }
 
+/* Make images non-selectable */
+img {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
