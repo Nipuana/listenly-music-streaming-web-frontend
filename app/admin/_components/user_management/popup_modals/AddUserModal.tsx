@@ -65,17 +65,17 @@ export default function AddUserModal({ open, onClose, onSave }: AddUserModalProp
                 />
               </div>
               <div>
-                <Label htmlFor="role" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Role</Label>
-                <Select value={formData.role} onValueChange={value => setFormData({ ...formData, role: value })}>
-                  <SelectTrigger id="role" className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm w-full focus:ring-2 focus:ring-primary/30">
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
-                    <SelectContent className="w-full min-w-55 bg-white dark:bg-background border-none rounded-xl shadow-lg">
-                    <SelectItem value="user">User</SelectItem>
-                    <SelectItem value="admin">Admin</SelectItem>
-                    <SelectItem value="artist">Artist</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="email" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter email"
+                  className="mt-2 bg-background border-none rounded-xl px-5 py-3 text-base shadow-sm focus:ring-2 focus:ring-primary/30"
+                />
               </div>
               <div className="relative">
                 <Label htmlFor="password" className="uppercase text-xs font-bold tracking-widest text-muted-foreground">Password</Label>
