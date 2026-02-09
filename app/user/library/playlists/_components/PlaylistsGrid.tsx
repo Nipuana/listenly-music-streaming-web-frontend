@@ -23,7 +23,7 @@ export function PlaylistsGrid({ playlists }: PlaylistsGridProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid-responsive-auto">
           {playlists.map((playlist) => (
             <Card
               key={playlist.id}
