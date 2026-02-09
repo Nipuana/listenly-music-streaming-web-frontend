@@ -10,7 +10,7 @@ interface SidebarContextType {
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
-export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+export const SidebarProvider: React.FC<{ children: ReactNode; user?: any }> = ({ children, user }) => {
   // Initialize from localStorage, default to false if not set
   const [collapsed, setCollapsedState] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -27,8 +27,19 @@ export const SidebarProvider: React.FC<{ children: ReactNode }> = ({ children })
     setIsMounted(true);
   }, []);
 
+  // Force sidebar to be expanded for non-admin users
+  useEffect(() => {
+    if (user && user.role?.toLowerCase() !== 'admin' && collapsed) {
+      setCollapsedState(false);
+    }
+  }, [user, collapsed]);
+
   // Update localStorage whenever collapsed state changes
   const setCollapsed = (newCollapsed: boolean) => {
+    // Prevent collapsing for non-admin users
+    if (user && user.role?.toLowerCase() !== 'admin' && newCollapsed) {
+      return;
+    }
     setCollapsedState(newCollapsed);
     if (typeof window !== 'undefined') {
       localStorage.setItem('sidebar-collapsed', JSON.stringify(newCollapsed));
