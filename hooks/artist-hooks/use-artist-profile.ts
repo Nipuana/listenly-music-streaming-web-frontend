@@ -1,4 +1,4 @@
-import { useArtistInfo } from './use-artist-info';
+import { useArtistInfo } from '../cashing-hooks/use-artist-info';
 
 interface UseArtistProfileReturn {
   name: string;
