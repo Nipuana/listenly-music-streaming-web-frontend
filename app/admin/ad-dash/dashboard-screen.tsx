@@ -2,20 +2,15 @@
 
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/Providers/Contexts/auth-context";
-import Sidebar from "@/components/layout/sidebar/sidebar";
 import { SidebarProvider, useSidebarState } from "@/Providers/Contexts/SidebarContext";
+import Sidebar from "@/components/layout/sidebar/sidebar";
 import UserManagementSection from "../_components/user_management/UserManagementSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Users, Mic2, DollarSign, Search, Bell, TrendingUp, Play } from "lucide-react";
-import { motion } from "framer-motion";
+import { LogoutConfirmDialog } from "@/components/ui/logout-confirm-dialog";
 
-
-const contentVariants = {
-  expanded: { marginLeft: 256 },
-  collapsed: { marginLeft: 64 }
-};
 
 export default function AdminDashboardScreen() {
   return (
@@ -28,17 +23,8 @@ export default function AdminDashboardScreen() {
 function InnerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const { logout, user: authUser } = useAuth();
   const { collapsed } = useSidebarState();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   async function handleLogout() {
     setShowLogoutConfirm(true);
@@ -49,58 +35,18 @@ function InnerDashboard() {
     setShowLogoutConfirm(false);
   }
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background font-sans text-foreground">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} />
-        <motion.div 
-          variants={contentVariants}
-          initial="expanded"
-          animate={collapsed ? "collapsed" : "expanded"}
-          transition={{ duration: 0.3, ease: "easeInOut" }}
-          className=""
-        >
-          <main className="p-6 md:p-8 lg:p-10 xl:p-12 min-h-screen flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-muted-foreground">Loading dashboard...</p>
-            </div>
-          </main>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background font-sans text-foreground">
+    <div className="min-h-screen bg-linear-to-br from-background via-background-secondary to-background-tertiary">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} user={authUser} onLogout={handleLogout} mode="admin" />
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white dark:bg-card rounded-3xl shadow-2xl p-10 max-w-sm w-full mx-4 border border-border">
-            <h3 className="text-2xl font-bold mb-2 text-foreground">Confirm Logout</h3>
-            <p className="mb-6 text-muted-foreground">Are you sure you want to log out?</p>
-            <div className="flex gap-3 w-full">
-              <Button onClick={() => setShowLogoutConfirm(false)} variant="outline" className="flex-1 font-semibold">Cancel</Button>
-              <Button
-                onClick={confirmLogout}
-                variant="destructive"
-                className="flex-1 font-semibold border border-destructive text-destructive bg-white hover:bg-destructive hover:text-white shadow-sm hover:shadow-md"
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-      <motion.div 
-        variants={contentVariants}
-        initial="expanded"
-        animate={collapsed ? "collapsed" : "expanded"}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className=""
-      >
+
+      <div style={{ marginLeft: collapsed ? '64px' : '256px' }} className="transition-all duration-300 ease-in-out">
+        <LogoutConfirmDialog
+          isOpen={showLogoutConfirm}
+          onClose={() => setShowLogoutConfirm(false)}
+          onConfirm={confirmLogout}
+        />
         <MainContent activeTab={activeTab} />
-      </motion.div>
+      </div>
     </div>
   );
 }
