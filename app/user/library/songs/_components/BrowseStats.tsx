@@ -13,7 +13,7 @@ interface BrowseStatsProps {
 
 export function BrowseStats({ stats }: BrowseStatsProps) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
       {stats.map((stat, index) => (
         <Card
           key={index}
