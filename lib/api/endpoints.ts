@@ -17,6 +17,7 @@ export const API = {
     GET_USER: (id: string) => `/api/admin/get-user/${id}`,
     UPDATE_USER: (id: string) => `/api/admin/update-user/${id}`,
     DELETE_USER: (id: string) => `/api/admin/delete-user/${id}`,
+    CLEAN_ORPHANED_LIKES: '/api/admin/clean-orphaned-likes',
   },
 
   USER_INFO: {
