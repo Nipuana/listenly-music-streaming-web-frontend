@@ -11,46 +11,11 @@ interface Playlist {
   trackCount: number;
 }
 
-export function PlaylistsSection() {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface PlaylistsSectionProps {
+  playlists: any[];
+}
 
-  useEffect(() => {
-    const fetchPlaylists = async () => {
-      try {
-        setLoading(true);
-        const data = await getAllPlaylists();
-        setPlaylists(Array.isArray(data) ? data : data?.data || data?.playlists || []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch playlists");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlaylists();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex flex-col gap-10">
-        <div className="text-center py-10">
-          <p className="text-foreground-muted">Loading playlists...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col gap-10">
-        <div className="text-center py-10">
-          <p className="text-red-500">Error: {error}</p>
-        </div>
-      </div>
-    );
-  }
+export function PlaylistsSection({ playlists }: PlaylistsSectionProps) {
 
   return (
     <div className="flex flex-col gap-10">
