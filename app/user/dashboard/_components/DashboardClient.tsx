@@ -4,7 +4,7 @@ import Sidebar from "../../../../components/layout/sidebar/sidebar";
 import { SidebarProvider, useSidebarState } from "../../../../Providers/Contexts/SidebarContext";
 import { WelcomeBanner } from "./WelcomeBanner";
 import { StatsGrid } from "./StatsGrid";
-import { RecentlyPlayed } from "./RecentlyPlayed";
+import { RecentlyPlayed } from "./RecentlyPlayed-sections/RecentlyPlayed";
 import { YourPlaylists } from "./YourPlaylists";
 import { motion } from "framer-motion";
 import { useEffect } from "react";
