@@ -233,7 +233,7 @@ export default function UserManagementSection() {
 
 
         {loading ? (
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-12">      
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
           </div>
         ) : filteredUsers.length === 0 ? (
