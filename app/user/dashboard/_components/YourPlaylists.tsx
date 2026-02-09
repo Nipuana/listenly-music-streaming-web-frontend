@@ -2,29 +2,64 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
-
-const playlists = [
-  {
-    id: 1,
-    name: "Chill Vibes",
-    songs: 45,
-    image: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=300&h=300&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Workout Mix",
-    songs: 32,
-    image: "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=300&h=300&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Study Sessions",
-    songs: 28,
-    image: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300&fit=crop",
-  },
-];
+import { useMyPlaylists } from "@/hooks/cashing-hooks/use-my-playlists";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
+  const { playlists, loading, error } = useMyPlaylists();
+
+  if (loading) {
+    return (
+      <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Your Playlists</CardTitle>
+            <Button asChild variant="link" className="p-0">
+              <Link href="/user/playlists">View All</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid-responsive-auto">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Card key={index} className="border-border/50">
+                <CardContent className="card-responsive">
+                  <Skeleton className="w-full aspect-square rounded-lg mb-3" />
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/2" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle>Your Playlists</CardTitle>
+            <Button asChild variant="link" className="p-0">
+              <Link href="/user/playlists">View All</Link>
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">Failed to load playlists</p>
+            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Ensure playlists is an array before mapping
+  const playlistsArray = Array.isArray(playlists) ? playlists : [];
+
   return (
     <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
       <CardHeader>
@@ -36,30 +71,35 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className={`grid gap-4 ${
-          collapsed
-            ? 'grid-cols-2 md:grid-cols-4 lg:grid-cols-5' // More columns when collapsed
-            : 'grid-cols-1 md:grid-cols-3' // Normal columns when expanded
-        }`}>
-          {playlists.map((playlist) => (
-            <Link key={playlist.id} href={`/user/playlist/${playlist.id}`}>
-              <Card className="border-border/50 hover:shadow-primary transition-all cursor-pointer">
-                <CardContent className="p-4">
-                  <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
-                    <Image
-                      src={playlist.image}
-                      alt={playlist.name}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                    />
-                  </div>
-                  <h4 className="font-semibold">{playlist.name}</h4>
-                  <p className="text-sm text-muted-foreground">{playlist.songs} songs</p>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
+        <div className="grid-responsive-auto">
+          {playlistsArray.length > 0 ? (
+            playlistsArray.map((playlist) => (
+              <Link key={playlist.id} href={`/user/playlist/${playlist.id}`}>
+                <Card className="border-border/50 hover:shadow-primary transition-all cursor-pointer">
+                  <CardContent className="card-responsive">
+                    <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
+                      <Image
+                        src={playlist.coverUrl}
+                        alt={playlist.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
+                    </div>
+                    <h4 className="font-semibold text-responsive-sm">{playlist.name}</h4>
+                    <p className="text-sm text-muted-foreground">{playlist.trackCount} songs</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-muted-foreground">No playlists yet</p>
+              <Button asChild variant="outline" className="mt-2">
+                <Link href="/user/playlists">Create your first playlist</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
