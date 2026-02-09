@@ -1,5 +1,5 @@
 "use client";
-import { Home, Library, Heart, TrendingUp } from "lucide-react";
+import { Home, Library, Heart } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
@@ -11,7 +11,6 @@ export function MainNavSection() {
     { href: "/user/dashboard", icon: Home, label: "Dashboard" },
     { href: "/user/library", icon: Library, label: "Library" },
     { href: "/user/liked", icon: Heart, label: "Liked Songs" },
-    { href: "/user/trending", icon: TrendingUp, label: "Trending" },
   ];
 
   return (

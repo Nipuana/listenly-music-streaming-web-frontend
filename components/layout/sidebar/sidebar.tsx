@@ -4,6 +4,7 @@ import React from "react";
 import { useThemeToggle } from "@/hooks/use-theme-toggle";
 import { useSidebarState } from "../../../Providers/Contexts/SidebarContext";
 import { usePathname } from "next/navigation";
+import { usePlayer } from "@/Providers/Contexts/player-context";
 
 // Admin sections
 import HeaderSection from "./admin-sections/HeaderSection";
@@ -16,6 +17,7 @@ import UserHeaderSection from "./user-sections/UserHeaderSection";
 import { MainNavSection } from "./user-sections/MainNavSection";
 import { PlaylistsSection } from "./user-sections/PlaylistsSection";
 import { SettingsSection } from "./user-sections/SettingsSection";
+import ProfileSection from "./user-sections/ProfileSection";
 
 interface SidebarProps {
   activeTab?: string;
@@ -27,6 +29,7 @@ interface SidebarProps {
 
 export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user, onLogout, mode = 'auto' }: SidebarProps) {
   const { collapsed, setCollapsed, isMounted } = useSidebarState();
+  const { currentSong, isBarVisible } = usePlayer();
   const { toggleTheme, isDark, mounted } = useThemeToggle();
   const pathname = usePathname();
 
@@ -51,6 +54,12 @@ export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user,
 
   const sidebarMode = getSidebarMode();
 
+  // Force sidebar to stay expanded in user mode
+  const effectiveCollapsed = sidebarMode === 'user' ? false : collapsed;
+  
+  // Override setCollapsed for user mode to prevent collapsing
+  const effectiveSetCollapsed = sidebarMode === 'user' ? () => {} : setCollapsed;
+
   // Define sections for each role
   const roleSections: Record<string, {
     header: React.ReactElement;
@@ -61,24 +70,27 @@ export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user,
     profile?: React.ReactElement;
   }> = {
     admin: {
-      header: <HeaderSection collapsed={collapsed} setCollapsed={setCollapsed} />,
-      main: <MainMenuSection activeTab={activeTab} setActiveTab={setActiveTab} collapsed={collapsed} />,
-      system: <SystemSection activeTab={activeTab} setActiveTab={setActiveTab} collapsed={collapsed} toggleTheme={toggleTheme} isDark={isDark} mounted={mounted} />,
-      profile: <UserProfileSection collapsed={collapsed} user={user} onLogout={onLogout} />
+      header: <HeaderSection collapsed={effectiveCollapsed} setCollapsed={effectiveSetCollapsed} />,
+      main: <MainMenuSection activeTab={activeTab} setActiveTab={setActiveTab} collapsed={effectiveCollapsed} />,
+      system: <SystemSection activeTab={activeTab} setActiveTab={setActiveTab} collapsed={effectiveCollapsed} toggleTheme={toggleTheme} isDark={isDark} mounted={mounted} />,
+      profile: <UserProfileSection collapsed={effectiveCollapsed} user={user} onLogout={onLogout} />
     },
     user: {
-      header: <UserHeaderSection collapsed={collapsed} setCollapsed={setCollapsed} />,
+      header: <UserHeaderSection collapsed={effectiveCollapsed} setCollapsed={effectiveSetCollapsed} allowCollapse={false} />,
+      profile: <ProfileSection user={user} collapsed={effectiveCollapsed} />,
       main: <MainNavSection />,
       playlists: <PlaylistsSection />,
-      settings: <SettingsSection />
+      settings: <SettingsSection onLogout={onLogout} />
     }
   };
 
   const sections = roleSections[sidebarMode] || roleSections.user;
 
+  const shouldPadForPlayer = sidebarMode === 'user' && Boolean(currentSong) && isBarVisible;
+
   return (
-    <div className={`fixed left-0 top-0 z-40 h-full bg-card/95 backdrop-blur-xl border-r border-border shadow-2xl transition-all duration-300 ease-in-out ${collapsed ? 'w-16' : 'w-64'}`}>
-      <div className="flex flex-col h-full overflow-hidden">
+    <div className={`fixed left-0 top-0 z-40 h-full bg-card/95 backdrop-blur-xl border-r border-border shadow-2xl ${sidebarMode === 'admin' ? 'transition-all duration-300 ease-in-out' : ''} ${effectiveCollapsed ? 'w-16' : 'w-64'}`}>
+      <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-out ${shouldPadForPlayer ? 'pb-24' : ''}`}>
         <div className="p-4">
           {/* Header Section */}
           {sections.header}
