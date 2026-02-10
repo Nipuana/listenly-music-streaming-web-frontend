@@ -4,24 +4,9 @@ import { usePlayQueue } from "@/hooks/player-hooks/use-play-queue";
 import { usePlayer } from "@/Providers/Contexts/player-context";
 import { ConfirmPopup } from "./popup/ConfirmPopup";
 import { LikedSongRow } from "./LikedSongRow";
-import { toast } from "react-toastify";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-
-export interface Song {
-  id: string;
-  _id?: string;
-  title: string;
-  artist: string;
-  album?: string;
-  createdAt?: string;
-  genre: string;
-  duration: string;
-  coverImageUrl: string;
-  audioUrl?: string;
-  addedAt?: string;
-  artistProfilePic?: string;
-  uploadedBy?: string | { _id?: string; id?: string; [key: string]: unknown };
-}
+import { Song, createOpenConfirm, createHandleConfirm, createHandleCancel, createHandleUnlike, createHandlePlayAll, createHandleShuffle } from "../utils/handlers";
+import { SongDetailsPopup } from "../../_components/popups/SongDetailsPopup";
 
 interface LikedSongsGridProps {
   songs: Song[];
@@ -41,35 +26,16 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
     confirmLabel: "Confirm",
   });
 
-  const openConfirm = useCallback(
-    (options: { title: string; message: string; confirmLabel?: string; onConfirm: () => void }) => {
-      confirmActionRef.current = options.onConfirm;
-      setConfirmState({
-        open: true,
-        title: options.title,
-        message: options.message,
-        confirmLabel: options.confirmLabel || "Confirm",
-      });
-    },
-    []
-  );
+  const [selectedSong, setSelectedSong] = useState<Song | null>(null);
+  const [isSongDetailsOpen, setIsSongDetailsOpen] = useState(false);
 
-  const handleConfirm = useCallback(() => {
-    const action = confirmActionRef.current;
-    confirmActionRef.current = null;
-    setConfirmState({ open: false, title: "", message: "", confirmLabel: "Confirm" });
-    action?.();
-  }, []);
+  const openConfirm = useCallback(createOpenConfirm(setConfirmState, confirmActionRef), [setConfirmState, confirmActionRef]);
 
-  const handleCancel = useCallback(() => {
-    confirmActionRef.current = null;
-    setConfirmState({ open: false, title: "", message: "", confirmLabel: "Confirm" });
-  }, []);
+  const handleConfirm = useCallback(createHandleConfirm(confirmActionRef, setConfirmState), [confirmActionRef, setConfirmState]);
 
-  const handleUnlike = useCallback((songId: string) => {
-    setLocalSongs((prev) => prev.filter((song) => song?.id !== songId));
-    toast.info("Removed from liked songs");
-  }, []);
+  const handleCancel = useCallback(createHandleCancel(confirmActionRef, setConfirmState), [confirmActionRef, setConfirmState]);
+
+  const handleUnlike = useCallback(createHandleUnlike(setLocalSongs), [setLocalSongs]);
 
   const availableSongs = useMemo(
     () => localSongs.filter((song) => Boolean(song?.id || song?._id) && Boolean(song?.audioUrl)),
@@ -97,17 +63,19 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
 
   const isPlayingLiked = isPlaying && currentIndex >= 0;
 
-  const handlePlayAll = () => {
-    if (isPlayingLiked) {
-      togglePlay();
-      return;
-    }
-    playAll();
-  };
+  const handlePlayAll = useCallback(createHandlePlayAll(isPlayingLiked, togglePlay, playAll), [isPlayingLiked, togglePlay, playAll]);
 
-  const handleShuffle = () => {
-    playShuffled();
-  };
+  const handleShuffle = useCallback(createHandleShuffle(playShuffled), [playShuffled]);
+
+  const handleSongDetailsOpen = useCallback((song: Song) => {
+    setSelectedSong(song);
+    setIsSongDetailsOpen(true);
+  }, []);
+
+  const handleSongDetailsClose = useCallback(() => {
+    setIsSongDetailsOpen(false);
+    setSelectedSong(null);
+  }, []);
 
 
   return (
@@ -191,6 +159,7 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
                       onConfirm: confirmAction,
                     })
                   }
+                  onRowClick={() => handleSongDetailsOpen(song)}
                 />
               );
             })}
@@ -229,6 +198,18 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
         confirmLabel={confirmState.confirmLabel}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
+      />
+
+      <SongDetailsPopup
+        song={selectedSong}
+        isOpen={isSongDetailsOpen}
+        onClose={handleSongDetailsClose}
+        onPlay={() => {
+          if (!selectedSong) return;
+          const songId = selectedSong.id || (selectedSong as any)._id;
+          const index = availableSongs.findIndex(s => (s.id || (s as any)._id) === songId);
+          if (index >= 0) playAtIndex(index);
+        }}
       />
     </div>
   );
