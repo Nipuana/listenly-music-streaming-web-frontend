@@ -1,7 +1,8 @@
+"use client";
+
 import { Music, User, Settings, LogOut } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
-import { getAuthToken, getUserData, clearAuthCookies } from "@/lib/cookies/user-data-cookie";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,27 +12,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { LogoutConfirmDialog } from "../ui/logout-confirm-dialog";
+import { useState } from "react";
+import { useAuth } from "@/Providers/Contexts/auth-context";
 
-async function handleLogout() {
-  "use server";
-  await clearAuthCookies();
-}
+export default function Header() {
+  const { isAuthenticated, user, logout } = useAuth();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-export default async function Header() {
-  const token = await getAuthToken();
-  const userData = await getUserData();
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutConfirm(false);
+    await logout();
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutConfirm(false);
+  };
 
   return (
     <header className="bg-card/60 backdrop-blur-md border-b sticky top-0 z-50">
       <div className="px-6 py-4 flex items-center justify-between">
-        <Link href={token ? "/user/dashboard" : "/"} className="flex items-center gap-2.5 cursor-pointer">
+        <Link href={isAuthenticated ? "/user/dashboard" : "/"} className="flex items-center gap-2.5 cursor-pointer">
           <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary">
             <Music className="w-5 h-5 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-bold">Listenly</h1>
         </Link>
         <nav className="flex items-center gap-6">
-          {!token && (
+          {!isAuthenticated && (
             <>
               <a href="#features" className="text-sm text-foreground/80 hover:text-foreground transition-colors">Features</a>
               <a href="#about" className="text-sm text-foreground/80 hover:text-foreground transition-colors">About</a>
@@ -39,7 +51,7 @@ export default async function Header() {
             </>
           )}
           
-          {!token ? (
+          {!isAuthenticated ? (
             <>
               <Button asChild variant="ghost" size="sm" className="text-primary hover:bg-accent">
                 <Link href="/login">Login</Link>
@@ -53,7 +65,7 @@ export default async function Header() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-accent">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src={userData?.avatar} alt={userData?.name || "User"} />
+                    <AvatarImage src={user?.avatar} alt={user?.name || "User"} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-sm">
                       <User className="h-4 w-4" />
                     </AvatarFallback>
@@ -63,9 +75,9 @@ export default async function Header() {
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{userData?.name || "User"}</p>
+                    <p className="text-sm font-medium leading-none">{user?.name || "User"}</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {userData?.email || "user@example.com"}
+                      {user?.email || "user@example.com"}
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -83,19 +95,20 @@ export default async function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <form action={handleLogout}>
-                    <button type="submit" className="flex w-full items-center cursor-pointer text-destructive">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </button>
-                  </form>
+                <DropdownMenuItem onClick={handleLogoutClick}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
         </nav>
       </div>
+      <LogoutConfirmDialog
+        isOpen={showLogoutConfirm}
+        onClose={handleLogoutCancel}
+        onConfirm={handleLogoutConfirm}
+      />
     </header>
   );
 }
