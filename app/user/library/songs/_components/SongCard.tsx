@@ -94,17 +94,19 @@ export function SongCard({ song, onPlay }: SongCardProps) {
   return (
     <>
       <Card
-        className="group border-border bg-background-secondary hover:shadow-shadow-primary transition-all cursor-pointer w-full max-w-64"
+        className="group border-border/50 hover:shadow-primary transition-all cursor-pointer overflow-hidden card-responsive w-full max-w-80 bg-linear-to-br from-card/90 to-card/60 backdrop-blur-sm hover:from-card hover:to-card/80"
         onClick={() => setIsPopupOpen(true)}
       >
-      <CardContent className="p-6">
-        <div className="relative mb-6">
-          <img
-            src={getSongCoverUrl(song.coverImageUrl)}
-            alt={song.title || 'Song cover'}
-            className="w-full aspect-square rounded-xl shadow-md group-hover:scale-105 transition-transform duration-300"
-            draggable="false"
-          />
+      <CardContent className="p-5">
+        <div className="relative mb-4">
+          <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-muted shadow-lg group-hover:shadow-xl transition-shadow duration-300">
+            <img
+              src={getSongCoverUrl(song.coverImageUrl)}
+              alt={song.title || 'Song cover'}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              draggable="false"
+            />
+          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button

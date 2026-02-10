@@ -27,7 +27,7 @@ interface SongsGridProps {
 
 export function SongsGrid({ title, songs, onPlaySong }: SongsGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 6;
 
   const totalPages = Math.ceil(songs.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
