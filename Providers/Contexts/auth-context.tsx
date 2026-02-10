@@ -1,6 +1,6 @@
 "use client"
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { clearAuthCookies, getAuthToken, getUserData } from "@/lib/cookies/user-data-cookie";
+import { clearAllCookies, getAuthToken, getUserData } from "@/lib/cookies/user-data-cookie";
 import { useRouter } from "next/navigation";
 
 interface AuthContextProps {
@@ -15,6 +15,17 @@ interface AuthContextProps {
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
+
+const clearClientCookies = () => {
+    if (typeof document === "undefined") return;
+    const cookieList = document.cookie ? document.cookie.split("; ") : [];
+    const expires = new Date(0).toUTCString();
+
+    cookieList.forEach((cookie) => {
+        const name = cookie.split("=")[0];
+        document.cookie = `${name}=; expires=${expires}; path=/; samesite=lax`;
+    });
+};
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,7 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const logout = async () => {
         try {
-            await clearAuthCookies();
+            await clearAllCookies();
+            clearClientCookies();
             setIsAuthenticated(false);
             setUser(null);
             router.replace("/login");
