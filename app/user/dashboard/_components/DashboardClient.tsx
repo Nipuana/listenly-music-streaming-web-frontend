@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "../../../../Providers/Contexts/auth-context";
-import Sidebar from "../../../../components/layout/sidebar/sidebar";
-import { SidebarProvider, useSidebarState } from "../../../../Providers/Contexts/SidebarContext";
+import { SidebarProvider } from "../../../../Providers/Contexts/SidebarContext";
+import { SidebarLayout } from "../../../../components/layout/sidebar/SidebarLayout";
 import { WelcomeBanner } from "./WelcomeBanner";
 import { StatsGrid } from "./StatsGrid";
 import { RecentlyPlayed } from "./RecentlyPlayed-sections/RecentlyPlayed";
@@ -13,17 +13,12 @@ import { likeStatusCache } from "@/hooks/cashing-hooks/use-song-like-status";
 
 export function DashboardClient() {
   const { user, logout } = useAuth();
-  const { collapsed } = useSidebarState();
 
   return (
     <SidebarProvider user={user}>
-      <div className="min-h-screen bg-linear-to-br from-background via-background-secondary to-background-tertiary">
-        <Sidebar activeTab="" setActiveTab={() => {}} user={user} onLogout={logout} mode="user" />
-
-        <div style={{ marginLeft: '256px' }} className="transition-all duration-300 ease-in-out">
-          <MainContent user={user} />
-        </div>
-      </div>
+      <SidebarLayout mode="user" onLogout={logout}>
+        <MainContent user={user} />
+      </SidebarLayout>
     </SidebarProvider>
   );
 }
