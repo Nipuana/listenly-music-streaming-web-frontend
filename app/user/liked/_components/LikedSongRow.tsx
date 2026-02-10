@@ -4,8 +4,8 @@ import { getSongCoverUrl } from "@/hooks/media-hooks/get-song-cover";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { usePlayer } from "@/Providers/Contexts/player-context";
 import { useSongLikeStatus } from "@/hooks/cashing-hooks/use-song-like-status";
-import { formatDuration, formatRelativeTime } from "../utils/utils";
-import type { Song } from "./LikedSongsGrid";
+import { formatDuration, formatRelativeTime } from "../utils/formatting-utils";
+import type { Song } from "../utils/handlers";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LikedSongRowProps {
@@ -15,6 +15,7 @@ interface LikedSongRowProps {
   onRequestUnlike: (confirmAction: () => void) => void;
   onUnlike: (songId: string) => void;
   isUnavailable: boolean;
+  onRowClick?: () => void;
 }
 
 export function LikedSongRow({
@@ -24,6 +25,7 @@ export function LikedSongRow({
   onRequestUnlike,
   onUnlike,
   isUnavailable,
+  onRowClick,
 }: LikedSongRowProps) {
   let userId: string | undefined;
   if (typeof song.uploadedBy === "string") userId = song.uploadedBy;
@@ -68,9 +70,10 @@ export function LikedSongRow({
 
   return (
     <tr
-      className={`group border-t border-border transition-colors ${
+      className={`group border-t border-border transition-colors cursor-pointer ${
         isUnavailable ? "bg-background/30 text-foreground-muted" : "hover:bg-background"
       }`}
+      onClick={onRowClick}
     >
       <td className="py-4 pl-4 align-middle text-foreground-secondary">{idx + 1}</td>
       <td className="py-4 align-middle">

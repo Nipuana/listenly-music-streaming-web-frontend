@@ -6,7 +6,7 @@ import { Play, Pause, Calendar, User, Clock, X } from "lucide-react";
 import { getSongCoverUrl } from "@/hooks/media-hooks/get-song-cover";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { usePlayer } from "@/Providers/Contexts/player-context";
-import { formatDuration, formatRelativeTime } from "../../liked/utils/utils";
+import { formatDuration, formatRelativeTime } from "../../liked/utils/formatting-utils";
 import { getFullImageUrl } from "@/lib/utils/image-util";
 import { ArtistProfilePopup } from "./ArtistProfilePopup";
 import { Slider } from "@/components/ui/slider";
