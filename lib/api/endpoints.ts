@@ -17,6 +17,7 @@ export const API = {
     GET_USER: (id: string) => `/api/admin/get-user/${id}`,
     UPDATE_USER: (id: string) => `/api/admin/update-user/${id}`,
     DELETE_USER: (id: string) => `/api/admin/delete-user/${id}`,
+    CLEAN_ORPHANED_LIKES: '/api/admin/clean-orphaned-likes',
   },
 
   USER_INFO: {
@@ -45,16 +46,16 @@ export const API = {
   },
 
   PLAYLISTS: {
-    GET_ALL: '/api/playlists/',
+    GET_ALL: '/api/playlists/get-all',
     GET_MY: '/api/playlists/user/my-playlists',
-    GET_BY_ID: (id: string) => `/api/playlists/${id}`,
-    CREATE: '/api/playlists/',
-    UPDATE: (id: string) => `/api/playlists/${id}`,
-    DELETE: (id: string) => `/api/playlists/${id}`,
+    GET_BY_ID: (id: string) => `/api/playlists/getPlaylistById/${id}`,
+    CREATE: '/api/playlists/create-playlist',
+    UPDATE: (id: string) => `/api/playlists/update-playlist/${id}`,
+    DELETE: (id: string) => `/api/playlists/delete-playlist/${id}`,
     ADD_SONG: (id: string) => `/api/playlists/${id}/songs`,
-    REMOVE_SONG: (id: string, songId: string) => `/api/playlists/${id}/songs/${songId}`,
-    REORDER_SONGS: (id: string) => `/api/playlists/${id}/songs/reorder`,
-  },
+    REMOVE_SONG: (id: string, songId: string) => `/api/playlists/remove-song-from-playlist/${id}/${songId}`,
+    REORDER_SONGS: (id: string) => `/api/playlists//reorder-songs/${id}`,
+  },    
 
   PLAYLIST_FAVORITES: {
     GET_FAVORITED: '/api/playlists/user/favorited',

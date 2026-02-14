@@ -41,15 +41,15 @@ export default function ResetPasswordForm({ token }: { token: string }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-purple-50 p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-background p-6">
       <div className="w-full max-w-md">
         {/* Logo and Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-linear-to-br from-primary to-secondary shadow-lg">
-              <Music className="w-8 h-8 text-white" />
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-primary/10 shadow-lg border border-primary/20">
+              <Music className="w-8 h-8 text-primary" />
             </div>
-            <span className="text-3xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <span className="text-3xl font-bold bg-(--gradient-primary) bg-clip-text text-transparent">
               Listenly
             </span>
           </div>
@@ -57,8 +57,8 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10 border border-gray-100">
-          <h1 className="text-2xl font-bold text-primary mb-2 text-center">
+        <div className="bg-card rounded-3xl shadow-2xl p-8 md:p-10 border border-border">
+          <h1 className="text-2xl font-bold text-foreground mb-2 text-center">
             Set New Password
           </h1>
           <p className="text-muted-foreground text-sm mb-8 text-center">
@@ -68,7 +68,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} noValidate>
             {/* New Password */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-primary" htmlFor="password">
+              <label className="block text-sm font-semibold mb-2 text-foreground" htmlFor="password">
                 New Password
               </label>
               <div className="relative">
@@ -80,7 +80,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className={`pl-12 pr-12 h-12 rounded-xl border-2 ${
-                    errors.password ? "border-error focus:border-error" : "border-gray-200 focus:border-secondary"
+                    errors.password ? "border-error focus:border-error" : "border-border focus:border-secondary"
                   }`}
                   {...register("password")}
                   autoComplete="new-password"
@@ -100,7 +100,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm font-semibold mb-2 text-primary" htmlFor="confirmPassword">
+              <label className="block text-sm font-semibold mb-2 text-foreground" htmlFor="confirmPassword">
                 Confirm Password
               </label>
               <div className="relative">
@@ -112,7 +112,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className={`pl-12 pr-12 h-12 rounded-xl border-2 ${
-                    errors.confirmPassword ? "border-error focus:border-error" : "border-gray-200 focus:border-secondary"
+                    errors.confirmPassword ? "border-error focus:border-error" : "border-border focus:border-secondary"
                   }`}
                   {...register("confirmPassword")}
                   autoComplete="new-password"
@@ -132,7 +132,7 @@ export default function ResetPasswordForm({ token }: { token: string }) {
 
             <Button 
               type="submit" 
-              className="w-full h-12 bg-linear-to-r from-primary to-secondary hover:from-primary-hover hover:to-secondary-hover text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              className="w-full h-12 bg-gradient-primary hover:bg-gradient-primary text-primary-foreground font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
               disabled={isSubmitting}
             >
               {isSubmitting ? "Resetting..." : "Reset Password"}

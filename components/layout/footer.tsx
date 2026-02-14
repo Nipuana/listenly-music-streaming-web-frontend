@@ -1,9 +1,11 @@
 import { Music } from "lucide-react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 export default function Footer() {
   return (
     <footer className="bg-background/60 backdrop-blur-md border-t border-border mt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="app-container py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* About */}
         <div>
           <div className="flex items-center gap-2 mb-4">
@@ -12,10 +14,10 @@ export default function Footer() {
             </div>
             <span className="text-xl font-bold text-primary">Listenly</span>
           </div>
-          <p className="text-foreground-muted text-sm mb-4">
+          <p className="text-muted-foreground text-sm mb-4">
             The ultimate music streaming platform. Discover new music, create playlists, and connect with friends.
           </p>
-          <p className="text-xs text-foreground-muted">© 2024 Listenly. All rights reserved.</p>
+          <p className="text-xs text-muted-foreground">© 2024 Listenly. All rights reserved.</p>
         </div>
         {/* Product */}
         <div>
@@ -39,14 +41,13 @@ export default function Footer() {
         <div>
           <h3 className="font-semibold mb-2 text-primary">Stay Updated</h3>
           <form className="flex flex-col gap-2">
-            <input
+            <Input
               type="email"
               placeholder="Your email"
-              className="rounded-md border border-border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-secondary bg-background"
             />
-            <button type="submit" className="bg-secondary text-secondary-foreground font-semibold rounded px-4 py-2">
+            <Button type="submit" variant="secondary">
               Subscribe
-            </button>
+            </Button>
           </form>
         </div>
       </div>

@@ -2,6 +2,7 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { getAllUsers, getUserById, createUser, updateUser, deleteUser } from "../api/api-calls/admin_APIs/ad-users";
+import { cleanOrphanedLikes } from "../api/api-calls/admin_APIs/song-likes";
 
 // Get all users
 export const handleGetAllUsers = async () => {
@@ -114,6 +115,29 @@ export const handleDeleteUser = async (id: string) => {
         return {
             success: false,
             message: err.message || "Failed to delete user"
+        };
+    }
+};
+
+// Clean orphaned likes
+export const handleCleanOrphanedLikes = async () => {
+    try {
+        const result = await cleanOrphanedLikes();
+        if (result.success) {
+            return {
+                success: true,
+                message: result.message || "Orphaned likes cleaned successfully",
+                data: result.data
+            };
+        }
+        return {
+            success: false,
+            message: result.message || "Failed to clean orphaned likes"
+        };
+    } catch (err: Error | any) {
+        return {
+            success: false,
+            message: err.message || "Failed to clean orphaned likes"
         };
     }
 };
