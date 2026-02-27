@@ -17,7 +17,7 @@ export function StatsGrid() {
         const Icon = stat.icon;
         return (
           <Card key={stat.title} className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg hover:bg-card-hover transition-colors">
-            <CardContent className="pt-6">
+            <CardContent className="pt-4 sm:pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>

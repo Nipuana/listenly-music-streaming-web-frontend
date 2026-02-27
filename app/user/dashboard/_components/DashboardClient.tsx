@@ -1,6 +1,5 @@
 "use client";
 import { useAuth } from "../../../../Providers/Contexts/auth-context";
-import { SidebarProvider } from "../../../../Providers/Contexts/SidebarContext";
 import { SidebarLayout } from "../../../../components/layout/sidebar/SidebarLayout";
 import { WelcomeBanner } from "./WelcomeBanner";
 import { StatsGrid } from "./StatsGrid";
@@ -15,11 +14,9 @@ export function DashboardClient() {
   const { user, logout } = useAuth();
 
   return (
-    <SidebarProvider user={user}>
-      <SidebarLayout mode="user" onLogout={logout}>
-        <MainContent user={user} />
-      </SidebarLayout>
-    </SidebarProvider>
+    <SidebarLayout mode="user">
+      <MainContent user={user} />
+    </SidebarLayout>
   );
 }
 
@@ -45,13 +42,11 @@ function MainContent({ user }: { user: any }) {
   }, []);
 
   return (
-    <main className="overflow-auto min-h-screen p-6 md:p-8 lg:p-10 xl:p-12">
-      <div className="app-container space-y-8 max-w-7xl mx-20px">
+    <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         <WelcomeBanner userName={user?.name || "Alex"} />
         <StatsGrid />
         <RecentlyPlayed collapsed={false} />
         <YourPlaylists collapsed={false} />
       </div>
-    </main>
   );
 }
