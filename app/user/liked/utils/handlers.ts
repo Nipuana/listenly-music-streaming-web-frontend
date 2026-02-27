@@ -25,7 +25,7 @@ type ConfirmState = {
 };
 
 type SetConfirmState = React.Dispatch<React.SetStateAction<ConfirmState>>;
-type ConfirmActionRef = React.MutableRefObject<(() => void) | null>;
+type ConfirmActionRef = React.RefObject<(() => void) | null>;
 type SetLocalSongs = React.Dispatch<React.SetStateAction<Song[]>>;
 
 export const createOpenConfirm = (
