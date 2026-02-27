@@ -2,6 +2,7 @@
 
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
+import { getFullImageUrl } from "@/lib/utils/image-util";
 
 interface ArtistAvatarProps {
   userId: string;
@@ -23,7 +24,7 @@ export function ArtistAvatar({ userId, size = 24, showTooltip = true, onClick }:
     >
       {profilePicSrc ? (
         <img
-          src={profilePicSrc}
+          src={getFullImageUrl(profilePicSrc) || undefined}
           alt={artistName || 'Artist'}
           className="w-full h-full object-cover"
           onError={(e) => {
