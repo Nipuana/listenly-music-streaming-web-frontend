@@ -145,92 +145,89 @@ export function SongCard({ song, onPlay }: SongCardProps) {
             </TooltipTrigger>
             <TooltipContent side="top">{isLiked ? "Unlike" : "Like"}</TooltipContent>
           </Tooltip>
-          <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="absolute top-3 right-3 rounded-full opacity-0 group-hover:opacity-100 transition-all shadow-lg bg-black/50 hover:bg-black/70 border-none h-10 w-10 cursor-pointer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreHorizontal className="w-4 h-4 text-white" />
-                  </Button>
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="top">More options</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end" className="w-56" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleLikeSong(song.id);
-                }}
-                disabled={likeLoading}
-              >
-                <Heart 
-                  className={`w-4 h-4 mr-2 transition-colors ${
-                    isLiked ? 'fill-red-500 text-red-500' : ''
-                  }`} 
-                />
-                {likeLoading ? 'Loading...' : (isLiked ? 'Unlike' : 'Like')}
-              </DropdownMenuItem>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add to Playlist
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="w-48" onClick={(e) => e.stopPropagation()}>
-                  {playlists.length > 0 ? (
-                    playlists.map((playlist) => (
-                      <DropdownMenuItem
-                        key={playlist.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAddToPlaylist(song.id, playlist.id);
-                        }}
-                      >
-                        {playlist.name}
-                      </DropdownMenuItem>
-                    ))
-                  ) : (
-                    <DropdownMenuItem disabled>
-                      No playlists available
-                    </DropdownMenuItem>
-                  )}
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuSeparator />
-              <div className="px-2 py-1.5">
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsArtistPopupOpen(true);
-                  }}
-                >
-                  <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold overflow-hidden">
-                    {profilePicSrc ? (
-                      <img
-                        src={getFullImageUrl(profilePicSrc) || undefined}
-                        alt={artistName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      profilePicFallback
-                    )}
-                  </div>
-                  <span className="text-sm font-medium">{artistName}</span>
-                </div>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
         <div className="space-y-3">
-          <h3 className="text-lg font-bold text-foreground truncate">
-            {song.title}
-          </h3>
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-lg font-bold text-foreground truncate flex-1">
+              {song.title}
+            </h3>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-8 w-8 shrink-0"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLikeSong(song.id);
+                  }}
+                  disabled={likeLoading}
+                >
+                  <Heart 
+                    className={`w-4 h-4 mr-2 transition-colors ${
+                      isLiked ? 'fill-red-500 text-red-500' : ''
+                    }`} 
+                  />
+                  {likeLoading ? 'Loading...' : (isLiked ? 'Unlike' : 'Like')}
+                </DropdownMenuItem>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add to Playlist
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent className="w-48" onClick={(e) => e.stopPropagation()}>
+                    {playlists.length > 0 ? (
+                      playlists.map((playlist) => (
+                        <DropdownMenuItem
+                          key={playlist.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleAddToPlaylist(song.id, playlist.id);
+                          }}
+                        >
+                          {playlist.name}
+                        </DropdownMenuItem>
+                      ))
+                    ) : (
+                      <DropdownMenuItem disabled>
+                        No playlists available
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1.5">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setIsArtistPopupOpen(true);
+                    }}
+                  >
+                    <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold overflow-hidden">
+                      {profilePicSrc ? (
+                        <img
+                          src={getFullImageUrl(profilePicSrc) || undefined}
+                          alt={artistName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        profilePicFallback
+                      )}
+                    </div>
+                    <span className="text-sm font-medium">{artistName}</span>
+                  </div>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
           <div
             className="flex items-center gap-3 cursor-pointer rounded-md px-2 py-1 border border-border/60 bg-background/70 shadow-sm transition-all hover:bg-background-secondary hover:border-border hover:shadow-md hover:ring-1 hover:ring-primary/40"
             onClick={(e) => {
