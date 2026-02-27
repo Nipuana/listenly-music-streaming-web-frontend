@@ -1,8 +1,19 @@
+"use client";
+
+import Header from "@/components/layout/header";
+import { PlaylistsClient } from "./_components/PlaylistsClient";
+import { SidebarProvider } from "@/Providers/Contexts/SidebarContext";
+import { useAuth } from "@/Providers/Contexts/auth-context";
+
 export default function PlaylistsPage() {
+  const { user, logout } = useAuth();
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-foreground mb-4">My Playlists</h1>
-      <p className="text-muted-foreground">Your playlists will appear here.</p>
-    </div>
+    <SidebarProvider user={user}>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <PlaylistsClient />
+      </div>
+    </SidebarProvider>
   );
 }
