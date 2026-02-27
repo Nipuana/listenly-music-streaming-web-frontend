@@ -79,7 +79,45 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
 
 
   return (
-    <div className="bg-card/60 backdrop-blur-md border-border shadow-lg rounded-md overflow-hidden">
+    <>
+      {/* Mobile Card Layout */}
+      <div className="block md:hidden space-y-3">
+        {pageSongs.map((song, idx) => {
+          const absoluteIndex = (page - 1) * pageSize + idx;
+          if (!song) return null;
+
+          const songId = song?.id || song?._id || "";
+          const isUnavailable = !songId || !song?.audioUrl;
+          const playableIndex = availableSongs.findIndex((item) => (item.id || item._id) === songId);
+
+          return (
+            <LikedSongRow
+              key={song.id || `row-${idx}`}
+              song={song}
+              idx={absoluteIndex}
+              isUnavailable={isUnavailable}
+              onPlay={() => {
+                if (isUnavailable || playableIndex < 0) return;
+                playAtIndex(playableIndex);
+              }}
+              onRequestUnlike={(confirmAction) =>
+                openConfirm({
+                  title: "Remove from liked songs",
+                  message: "Are you sure you want to remove this song from your liked list?",
+                  confirmLabel: "Unlike",
+                  onConfirm: confirmAction,
+                })
+              }
+              onUnlike={handleUnlike}
+              onRowClick={() => handleSongDetailsOpen(song)}
+              isMobile={true}
+            />
+          );
+        })}
+      </div>
+
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block bg-card/60 backdrop-blur-md border-border shadow-lg rounded-md overflow-hidden">
       <div className="p-6 border-b border-border bg-background-secondary">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -160,6 +198,7 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
                     })
                   }
                   onRowClick={() => handleSongDetailsOpen(song)}
+                  isMobile={false}
                 />
               );
             })}
@@ -190,6 +229,7 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
           </button>
         </div>
       </div>
+      </div>
 
       <ConfirmPopup
         open={confirmState.open}
@@ -211,6 +251,6 @@ export function LikedSongsGrid({ songs }: LikedSongsGridProps) {
           if (index >= 0) playAtIndex(index);
         }}
       />
-    </div>
+    </>
   );
 }
