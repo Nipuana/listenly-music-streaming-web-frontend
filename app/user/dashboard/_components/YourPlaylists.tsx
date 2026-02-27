@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMyPlaylists } from "@/hooks/cashing-hooks/use-my-playlists";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getPlaylistCoverUrl } from "@/hooks/media-hooks/get-playlist-cover";
 
 export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
   const { playlists, loading, error } = useMyPlaylists();
@@ -15,7 +16,7 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
           <div className="flex items-center justify-between">
             <CardTitle>Your Playlists</CardTitle>
             <Button asChild variant="link" className="p-0">
-              <Link href="/user/playlists">View All</Link>
+              <Link href="/user/playlist">View All</Link>
             </Button>
           </div>
         </CardHeader>
@@ -43,7 +44,7 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
           <div className="flex items-center justify-between">
             <CardTitle>Your Playlists</CardTitle>
             <Button asChild variant="link" className="p-0">
-              <Link href="/user/playlists">View All</Link>
+              <Link href="/user/playlist">View All</Link>
             </Button>
           </div>
         </CardHeader>
@@ -59,6 +60,10 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
 
   // Ensure playlists is an array before mapping
   const playlistsArray = Array.isArray(playlists) ? playlists : [];
+  
+  // Show only first 3 playlists in dashboard
+  const displayedPlaylists = playlistsArray.slice(0, 3);
+  const hasMorePlaylists = playlistsArray.length > 3;
 
   return (
     <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
@@ -66,24 +71,25 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
         <div className="flex items-center justify-between">
           <CardTitle>Your Playlists</CardTitle>
           <Button asChild variant="link" className="p-0">
-            <Link href="/user/playlists">View All</Link>
+            <Link href="/user/playlist">View All</Link>
           </Button>
         </div>
       </CardHeader>
       <CardContent>
         <div className="grid-responsive-auto">
           {playlistsArray.length > 0 ? (
-            playlistsArray.map((playlist) => (
+            displayedPlaylists.map((playlist) => (
               <Link key={playlist.id} href={`/user/playlist/${playlist.id}`}>
                 <Card className="border-border/50 hover:shadow-primary transition-all cursor-pointer">
                   <CardContent className="card-responsive">
                     <div className="relative w-full aspect-square rounded-lg overflow-hidden bg-muted mb-3">
                       <Image
-                        src={playlist.coverUrl}
+                        src={getPlaylistCoverUrl(playlist.coverUrl)}
                         alt={playlist.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                        width={300}
+                        height={300}
+                        unoptimized={true}
+                        className="w-full h-full object-cover"
                       />
                     </div>
                     <h4 className="font-semibold text-responsive-sm">{playlist.name}</h4>
@@ -101,6 +107,19 @@ export function YourPlaylists({ collapsed = false }: { collapsed?: boolean }) {
             </div>
           )}
         </div>
+        
+        {hasMorePlaylists && (
+          <div className="flex justify-center mt-6">
+            <Button asChild variant="outline" className="hover:bg-primary/5 hover:border-primary/50 transition-colors">
+              <Link href="/user/playlists" className="flex items-center gap-2">
+                <span>Show all playlists</span>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                  +{playlistsArray.length - 3}
+                </span>
+              </Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
