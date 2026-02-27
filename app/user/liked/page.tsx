@@ -10,6 +10,7 @@ import { MyLikesHeader } from "./_components/MyLikesHeader";
 import { LikedSongsGrid } from "./_components/LikedSongsGrid";
 import { NoLikedSongsAlert } from "./_components/NoLikedSongsAlert";
 import { LikedSongsOverview } from "./_components/LikedSongsOverview";
+import Header from "@/components/layout/header";
 
 interface Song {
   id: string;
@@ -23,7 +24,7 @@ interface Song {
 }
 
 export default function MyLikesPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // still used for userName formatting
   const [likedSongs, setLikedSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(true);
   const userName =
@@ -51,8 +52,9 @@ export default function MyLikesPage() {
 
   if (loading) {
     return (
-      <SidebarProvider>
-        <SidebarLayout mode="user">
+      <SidebarProvider user={user}>
+        <Header />
+        <SidebarLayout mode="user" user={user} onLogout={logout}>
           <Loading />
         </SidebarLayout>
       </SidebarProvider>
@@ -60,10 +62,10 @@ export default function MyLikesPage() {
   }
 
   return (
-    <SidebarProvider>
-      <SidebarLayout mode="user">
-        <div className="min-h-screen bg-linear-to-br from-background via-background-secondary to-background-tertiary transition-colors duration-300">
-          <div className="app-container py-6 md:py-8 lg:py-10 xl:py-12 space-y-6 md:space-y-8">
+    <SidebarProvider user={user}>
+      <Header />
+      <SidebarLayout mode="user" user={user} onLogout={logout}>
+        <div className="min-h-screen bg-linear-to-br from-background via-background-secondary to-background-tertiary transition-colors duration-300 max-w-7xl mx-auto space-y-6 md:space-y-8 py-6 md:py-8 lg:py-10 xl:py-12">
             <MyLikesHeader userName={userName} songCount={likedSongs.length} />
 
             <LikedSongsGrid songs={likedSongs} />
@@ -72,7 +74,6 @@ export default function MyLikesPage() {
 
             <LikedSongsOverview songs={likedSongs} />
           </div>
-        </div>
       </SidebarLayout>
     </SidebarProvider>
   );
