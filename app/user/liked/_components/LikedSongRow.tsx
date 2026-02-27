@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { HeartOff, Pause, Play } from "lucide-react";
+import Image from "next/image";
 import { getSongCoverUrl } from "@/hooks/media-hooks/get-song-cover";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { usePlayer } from "@/Providers/Contexts/player-context";
@@ -16,6 +17,7 @@ interface LikedSongRowProps {
   onUnlike: (songId: string) => void;
   isUnavailable: boolean;
   onRowClick?: () => void;
+  isMobile?: boolean;
 }
 
 export function LikedSongRow({
@@ -26,6 +28,7 @@ export function LikedSongRow({
   onUnlike,
   isUnavailable,
   onRowClick,
+  isMobile = false,
 }: LikedSongRowProps) {
   let userId: string | undefined;
   if (typeof song.uploadedBy === "string") userId = song.uploadedBy;
@@ -68,6 +71,83 @@ export function LikedSongRow({
     wasLikedRef.current = isLiked;
   }, [isLiked, isUnavailable, onUnlike, song.id]);
 
+  // Mobile Card Layout
+  if (isMobile) {
+    return (
+      <div
+        className={`bg-card/60 backdrop-blur-md border border-border rounded-lg p-4 transition-colors cursor-pointer ${
+          isUnavailable ? "bg-background/30 text-foreground-muted" : "hover:bg-card"
+        }`}
+        onClick={onRowClick}
+      >
+        <div className="flex items-center gap-3">
+          <div className="shrink-0 w-12 h-12 rounded-md overflow-hidden">
+            <Image
+              src={getSongCoverUrl(song.coverImageUrl)}
+              alt={song.title || "cover"}
+              width={48}
+              height={48}
+              unoptimized={true}
+              className={`w-full h-full object-cover ${isUnavailable ? "opacity-50 grayscale" : ""}`}
+            />
+          </div>
+          
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-foreground truncate">
+              {song.title || "Unavailable"}
+            </div>
+            <div className="text-sm text-foreground-muted truncate">
+              {isUnavailable ? "This track is no longer available" : displayName}
+            </div>
+            <div className="text-xs text-foreground-muted mt-1">
+              {formatDuration(parseInt(song.duration) || 0)}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handlePlayClick();
+                  }}
+                  disabled={isUnavailable}
+                  className="rounded-full border border-border p-2 text-foreground hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label={isCurrentPlaying ? "Pause" : "Play"}
+                >
+                  {isCurrentPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">{isCurrentPlaying ? "Pause" : "Play"}</TooltipContent>
+            </Tooltip>
+            
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    if (!safeSongId) return;
+                    onRequestUnlike(() => toggleLikeStatus());
+                  }}
+                  disabled={isUnavailable || likeLoading}
+                  className="rounded-full border border-border p-2 text-foreground hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                  aria-label="Unlike"
+                >
+                  <HeartOff className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top">Unlike</TooltipContent>
+            </Tooltip>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop Table Layout
   return (
     <tr
       className={`group border-t border-border transition-colors cursor-pointer ${
@@ -78,9 +158,12 @@ export function LikedSongRow({
       <td className="py-4 pl-4 align-middle text-foreground-secondary">{idx + 1}</td>
       <td className="py-4 align-middle">
         <div className="flex items-center gap-4">
-          <img
+          <Image
             src={getSongCoverUrl(song.coverImageUrl)}
             alt={song.title || "cover"}
+            width={48}
+            height={48}
+            unoptimized={true}
             className={`w-12 h-12 rounded-md object-cover shadow-sm ${
               isUnavailable ? "opacity-50 grayscale" : ""
             }`}
@@ -108,7 +191,10 @@ export function LikedSongRow({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                onClick={handlePlayClick}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handlePlayClick();
+                }}
                 disabled={isUnavailable}
                 className="rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
                 aria-label={isCurrentPlaying ? "Pause" : "Play"}
@@ -122,7 +208,8 @@ export function LikedSongRow({
             <TooltipTrigger asChild>
               <button
                 type="button"
-                onClick={() => {
+                onClick={(event) => {
+                  event.stopPropagation();
                   if (!safeSongId) return;
                   onRequestUnlike(() => toggleLikeStatus());
                 }}
