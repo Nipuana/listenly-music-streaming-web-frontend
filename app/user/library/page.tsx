@@ -13,9 +13,10 @@ import { useAuth } from "@/Providers/Contexts/auth-context";
 // Import the cache from the hook to populate it
 import { likeStatusCache } from "@/hooks/cashing-hooks/use-song-like-status";
 import Loading from "./loading";
+import Header from "@/components/layout/header";
 
 export default function LibraryPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth(); // used for other logic but not passed to layout
   const [songsLoaded, setSongsLoaded] = useState(false);
   const [playlistsLoaded, setPlaylistsLoaded] = useState(false);
   const [likedSongsLoaded, setLikedSongsLoaded] = useState(false);
@@ -73,7 +74,8 @@ export default function LibraryPage() {
   if (!isFullyLoaded) {
     return (
       <SidebarProvider user={user}>
-        <SidebarLayout mode="user">
+        <Header />
+        <SidebarLayout mode="user" user={user} onLogout={logout}>
           <div className="max-w-7xl mx-auto">
             <Loading />
           </div>
@@ -84,7 +86,8 @@ export default function LibraryPage() {
 
   return (
     <SidebarProvider user={user}>
-      <SidebarLayout mode="user">
+      <Header />
+      <SidebarLayout mode="user" user={user} onLogout={logout}>
         <div className="max-w-7xl mx-auto">
           <SongsSection songs={songs} playlists={playlists} />
           <PlaylistsSection playlists={playlists} />
