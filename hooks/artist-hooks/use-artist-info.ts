@@ -20,6 +20,26 @@ export const useArtistInfo = (userId?: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const handler = (e: any) => {
+      try {
+        const updatedUser = e?.detail?.user;
+        if (!updatedUser) return;
+        if (!userId) return;
+        if (String(updatedUser.id || updatedUser._id) === String(userId)) {
+          // update cache and local state
+          artistCache.set(userId, updatedUser);
+          setArtist(updatedUser);
+        }
+      } catch (err) {
+        // ignore
+      }
+    };
+
+    window.addEventListener("profileUpdated", handler as EventListener);
+    return () => window.removeEventListener("profileUpdated", handler as EventListener);
+  }, [userId]);
+
+  useEffect(() => {
     if (!userId) {
       setArtist(null);
       return;

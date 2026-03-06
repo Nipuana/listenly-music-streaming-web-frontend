@@ -9,6 +9,14 @@ export interface AllUserRoleCounts {
   admins: number;
 }
 
+function extractUsersArray(payload: unknown): unknown[] {
+  if (Array.isArray(payload)) return payload;
+  if (!payload || typeof payload !== 'object') return [];
+  const obj = payload as Record<string, unknown>;
+  const candidate = obj.data ?? obj.users ?? obj.results;
+  return Array.isArray(candidate) ? candidate : [];
+}
+
 export const useAllUserRoleCounts = () => {
   const [counts, setCounts] = useState<AllUserRoleCounts>({
     total: 0,
@@ -24,11 +32,14 @@ export const useAllUserRoleCounts = () => {
     const fetchAllUserRoleCounts = async () => {
       try {
         setLoading(true);
-        const users = await getAllUsers();
+        const result = await getAllUsers();
+        const users = extractUsersArray(result);
 
-        const roleCounts = users.reduce((acc: AllUserRoleCounts, user: any) => {
+        const roleCounts = users.reduce((acc: AllUserRoleCounts, user) => {
+          const userObj: Record<string, unknown> = user && typeof user === 'object' ? (user as Record<string, unknown>) : {};
+          const role = typeof userObj.role === 'string' ? userObj.role : 'user';
           acc.total++;
-          switch (user.role) {
+          switch (role) {
             case 'user':
               acc.regularUsers++;
               break;
