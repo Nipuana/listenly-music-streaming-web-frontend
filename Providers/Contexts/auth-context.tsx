@@ -3,8 +3,11 @@ import { createContext, useContext, useState, ReactNode, useEffect } from "react
 import { clearAllCookies, getAuthToken, getUserData } from "@/lib/cookies/user-data-cookie";
 import { clearPlayerStateCookie } from "@/lib/cookies/player-state-cookie";
 import { clearRecentSongs } from "@/lib/cookies/recent-songs-cookie";
+import { clearSessionSongs } from "@/lib/cookies/session-songs-cookie";
 import { clearGenreCounters } from "@/lib/cookies/genre-counters-cookie";
 import { useRouter } from "next/navigation";
+import { clearMyPlaylistsCache, refetchMyPlaylists } from "@/hooks/cashing-hooks/use-my-playlists";
+import { clearAllPlaylistsCache, refetchAllPlaylists } from "@/hooks/cashing-hooks/use-all-playlists";
 
 interface AuthContextProps {
     isAuthenticated: boolean;
@@ -36,6 +39,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const checkAuth = async () => {
+        // new session begins – clear any leftover session song data
+        if (typeof window !== 'undefined') {
+            clearSessionSongs();
+        }
         try {
             const token = await getAuthToken();
             if (!token) {
@@ -45,6 +52,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 clearPlayerStateCookie();
                 clearRecentSongs();
                 clearGenreCounters();
+                clearMyPlaylistsCache();
+                clearAllPlaylistsCache();
                 setIsAuthenticated(false);
                 setUser(null);
                 setLoading(false);
@@ -53,7 +62,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             const user = await getUserData();
             setUser(user);
             setIsAuthenticated(!!token);
+
+            // Hydrate sidebar playlists once auth is confirmed
+            void refetchMyPlaylists().catch(() => {
+                // best-effort
+            });
+
+            // Hydrate browse playlists once auth is confirmed
+            void refetchAllPlaylists().catch(() => {
+                // best-effort
+            });
         } catch (err) {
+            clearMyPlaylistsCache();
+            clearAllPlaylistsCache();
             setIsAuthenticated(false);
             setUser(null);
         } finally {
@@ -71,7 +92,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             clearClientCookies();
             clearPlayerStateCookie();
             clearRecentSongs();
+            clearSessionSongs();
             clearGenreCounters();
+            clearMyPlaylistsCache();
+            clearAllPlaylistsCache();
 
             setIsAuthenticated(false);
             setUser(null);

@@ -17,6 +17,7 @@ import {
   setPlayerStateCookie,
 } from "@/lib/cookies/player-state-cookie";
 import { addRecentSong } from "@/lib/cookies/recent-songs-cookie";
+import { addSessionSong, clearSessionSongs } from "@/lib/cookies/session-songs-cookie";
 import { incrementGenreCounter } from "@/lib/cookies/genre-counters-cookie";
 
 export interface PlayerSong {
@@ -30,7 +31,7 @@ export interface PlayerSong {
   uploadedBy?: string | { _id?: string; id?: string; [key: string]: unknown };
 }
 
-type RepeatMode = "off" | "one";
+type RepeatMode = "off" | "one" | "all";
 
 interface PlayerState {
   queue: PlayerSong[];
@@ -41,6 +42,7 @@ interface PlayerState {
   repeatMode: RepeatMode;
   currentTime: number;
   duration: number;
+  volume: number;
 }
 
 interface PersistedState {
@@ -50,6 +52,7 @@ interface PersistedState {
   shuffleEnabled: boolean;
   repeatMode: RepeatMode;
   currentTime: number;
+  volume: number;
 }
 
 interface PlayerContextValue extends PlayerState {
@@ -63,6 +66,7 @@ interface PlayerContextValue extends PlayerState {
   seekTo: (time: number) => void;
   toggleShuffle: () => void;
   cycleRepeatMode: () => void;
+  setVolume: (volume: number) => void;
 }
 
 const PlayerContext = createContext<PlayerContextValue | undefined>(undefined);
@@ -91,6 +95,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   const [repeatMode, setRepeatMode] = useState<RepeatMode>("off");
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [volume, setVolumeState] = useState(0.7);
 
   const currentSong = queue[currentIndex] || null;
 
@@ -124,6 +129,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       const songToPlay = songs[startIndex];
       if (songToPlay) {
         addRecentSong(songToPlay);
+        addSessionSong(songToPlay);
         if (songToPlay.genre) {
           incrementGenreCounter(songToPlay.genre);
         }
@@ -136,6 +142,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     (song: PlayerSong) => {
       // Track the song being played
       addRecentSong(song);
+      addSessionSong(song);
       if (song.genre) {
         incrementGenreCounter(song.genre);
       }
@@ -158,12 +165,30 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     setCurrentTime(time);
   }, []);
 
+  const setVolume = useCallback((newVolume: number) => {
+    const clampedVolume = Math.max(0, Math.min(1, newVolume));
+    setVolumeState(clampedVolume);
+    if (audioRef.current) {
+      audioRef.current.volume = clampedVolume;
+    }
+  }, []);
+
   const toggleShuffle = useCallback(() => {
     setShuffleEnabled((prev) => !prev);
   }, []);
 
   const cycleRepeatMode = useCallback(() => {
-    setRepeatMode((prev) => (prev === "off" ? "one" : "off"));
+    setRepeatMode((prev) => {
+      switch (prev) {
+        case "off":
+          return "one";
+        case "one":
+          return "all";
+        case "all":
+        default:
+          return "off";
+      }
+    });
   }, []);
 
   const getNextIndex = useCallback(
@@ -180,9 +205,15 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
       const nextIndex = currentIndex + 1;
       if (nextIndex < queue.length) return nextIndex;
+
+      // when at end of queue
+      if (repeatMode === "all" && queue.length > 0) {
+        return 0;
+      }
+
       return -1;
     },
-    [queue.length, shuffleEnabled, currentIndex]
+    [queue.length, shuffleEnabled, currentIndex, repeatMode]
   );
 
   const playNext = useCallback(
@@ -201,6 +232,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       const nextSong = queue[nextIndex];
       if (nextSong) {
         addRecentSong(nextSong);
+        addSessionSong(nextSong);
         if (nextSong.genre) {
           incrementGenreCounter(nextSong.genre);
         }
@@ -227,6 +259,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const prevSong = queue[newIndex];
     if (prevSong) {
       addRecentSong(prevSong);
+      addSessionSong(prevSong);
       if (prevSong.genre) {
         incrementGenreCounter(prevSong.genre);
       }
@@ -236,6 +269,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!audioRef.current) {
       audioRef.current = new Audio();
+      audioRef.current.volume = volume;
     }
 
     const audio = audioRef.current;
@@ -254,6 +288,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         audio.play().catch(() => undefined);
         return;
       }
+      // if repeatMode is "all" the getNextIndex helper will wrap back,
+      // so playNext handles it automatically
       playNext();
     };
 
@@ -316,6 +352,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       historyRef.current = [];
       pendingSeekRef.current = 0;
       clearStoredState();
+      clearSessionSongs();
       return;
     }
 
@@ -325,15 +362,22 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     setQueue([stored.currentSong]);
     setCurrentIndex(0);
     setShuffleEnabled(!!stored.shuffleEnabled);
-    setRepeatMode(stored.repeatMode === "one" ? "one" : "off");
+    setRepeatMode(stored.repeatMode === "one" || stored.repeatMode === "all" ? stored.repeatMode : "off");
     setCurrentTime(stored.currentTime || 0);
     setDuration(0);
     setIsPlaying(!!stored.isPlaying);
     setIsBarVisible(stored.isBarVisible ?? true);
+    setVolume(stored.volume ?? 0.7);
 
     pendingSeekRef.current = stored.currentTime || 0;
     applySource(stored.currentSong, stored.currentTime || 0);
   }, [applySource, isAuthenticated, loading]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   useEffect(() => {
     if (loading || !isAuthenticated) return;
@@ -344,8 +388,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       shuffleEnabled,
       repeatMode,
       currentTime,
+      volume,
     });
-  }, [currentSong, isPlaying, isBarVisible, shuffleEnabled, repeatMode, currentTime, isAuthenticated, loading]);
+  }, [currentSong, isPlaying, isBarVisible, shuffleEnabled, repeatMode, currentTime, volume, isAuthenticated, loading]);
 
   const value = useMemo(
     () => ({
@@ -357,6 +402,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       repeatMode,
       currentTime,
       duration,
+      volume,
       currentSong,
       playQueue,
       playSong,
@@ -367,6 +413,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       seekTo,
       toggleShuffle,
       cycleRepeatMode,
+      setVolume,
     }),
     [
       queue,
@@ -387,6 +434,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
       seekTo,
       toggleShuffle,
       cycleRepeatMode,
+      volume,
+      setVolume,
     ]
   );
 
