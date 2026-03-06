@@ -7,7 +7,7 @@ import { useAuth } from "@/Providers/Contexts/auth-context";
 
 export default function DashboardPage() {
   
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   return (
     <SidebarProvider user={user}>
       <div className="flex flex-col min-h-screen">
