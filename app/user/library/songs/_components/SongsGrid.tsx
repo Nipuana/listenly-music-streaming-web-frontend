@@ -95,7 +95,7 @@ export function SongsGrid({ title, songs, onPlaySong }: SongsGridProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-8">
-        <div className="grid-responsive-auto">
+        <div className="grid-responsive-auto justify-items-center sm:justify-items-start">
           {currentSongs.map((song, index) => (
             <SongCard
               key={song.id}
