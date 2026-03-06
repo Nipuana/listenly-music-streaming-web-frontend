@@ -3,21 +3,25 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Clock, Music, TrendingUp, BarChart3 } from "lucide-react";
 import { getRecentSongs } from "@/lib/cookies/recent-songs-cookie";
+import { getSessionSongs } from "@/lib/cookies/session-songs-cookie";
 import { getTopGenres, getTotalSongsPlayed } from "@/lib/cookies/genre-counters-cookie";
 import { useEffect, useState } from "react";
 
 export function RecentActivity() {
   const [recentSongs, setRecentSongs] = useState<any[]>([]);
+  const [sessionSongs, setSessionSongs] = useState<any[]>([]);
   const [topGenres, setTopGenres] = useState<any[]>([]);
   const [totalSongs, setTotalSongs] = useState(0);
 
   useEffect(() => {
     // Load data from cookies
-    const songs = getRecentSongs().slice(0, 3); // Get 3 most recent
+    const songs = getRecentSongs().slice(0, 3); // Get 3 most recent overall
+    const session = getSessionSongs(); // session history
     const genres = getTopGenres(3); // Get top 3 genres
     const total = getTotalSongsPlayed();
 
     setRecentSongs(songs);
+    setSessionSongs(session);
     setTopGenres(genres);
     setTotalSongs(total);
   }, []);
@@ -76,6 +80,26 @@ export function RecentActivity() {
                   </p>
                 </div>
               </div>
+            )}
+
+            {/* Session Songs */}
+            {sessionSongs.length > 0 && (
+              <>
+                <p className="text-sm font-semibold mt-4">This session</p>
+                {sessionSongs.map((entry, index) => (
+                  <div key={`session-${entry.song.id}-${index}`} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
+                    <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
+                      <Music className="w-5 h-5 text-accent-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{entry.song.title}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {entry.song.artist} • {formatTimeAgo(entry.playedAt)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </>
             )}
 
             {/* Recent Songs */}

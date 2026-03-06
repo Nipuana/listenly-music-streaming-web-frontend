@@ -6,7 +6,7 @@ import { SidebarProvider } from "@/Providers/Contexts/SidebarContext";
 import { useAuth } from "@/Providers/Contexts/auth-context";
 
 export default function PlaylistsPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
 
   return (
     <SidebarProvider user={user}>

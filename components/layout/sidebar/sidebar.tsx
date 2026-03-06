@@ -5,6 +5,7 @@ import { useThemeToggle } from "@/hooks/use-theme-toggle";
 import { useSidebarState } from "../../../Providers/Contexts/SidebarContext";
 import { usePathname } from "next/navigation";
 import { usePlayer } from "@/Providers/Contexts/player-context";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Admin sections
 import HeaderSection from "./admin-sections/HeaderSection";
@@ -15,23 +16,30 @@ import UserProfileSection from "./admin-sections/UserProfileSection";
 // User sections
 import UserHeaderSection from "./user-sections/UserHeaderSection";
 import { MainNavSection } from "./user-sections/MainNavSection";
-import { PlaylistsSection } from "./user-sections/PlaylistsSection";
 import { SettingsSection } from "./user-sections/SettingsSection";
 import ProfileSection from "./user-sections/ProfileSection";
+import { PlaylistsSection } from "./user-sections/PlaylistsSection";
+// Artist sections
+import ArtistHeaderSection from "./artist-sections/ArtistHeaderSection";
+import { ArtistMainNavSection } from "./artist-sections/ArtistMainNavSection";
+import ArtistSongsSection from "./artist-sections/ArtistSongsSection";
 
 interface SidebarProps {
   activeTab?: string;
   setActiveTab?: (tab: string) => void;
   user?: any;
   onLogout?: () => void;
-  mode?: 'admin' | 'user' | 'auto';
+  onCreatePlaylist?: () => void;
+  onCreateSong?: () => void;
+  mode?: 'admin' | 'user' | 'artist' | 'auto';
 }
 
-export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user, onLogout, mode = 'auto' }: SidebarProps) {
-  const { collapsed, setCollapsed, isMounted } = useSidebarState();
+export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user, onLogout, onCreatePlaylist, onCreateSong, mode = 'auto' }: SidebarProps) {
+  const { collapsed, setCollapsed, mobileSidebarOpen, isMounted } = useSidebarState();
   const { currentSong, isBarVisible } = usePlayer();
   const { toggleTheme, isDark, mounted } = useThemeToggle();
   const pathname = usePathname();
+  const isMobile = useIsMobile();
 
   // Prevent flash by not rendering until mounted
   if (!isMounted) {
@@ -41,24 +49,27 @@ export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user,
   }
 
   // Determine sidebar mode
-  const getSidebarMode = (): 'admin' | 'user' => {
-    if (mode !== 'auto') return mode;
+  const getSidebarMode = (): 'admin' | 'user' | 'artist' => {
+    if (mode !== 'auto') return mode as 'admin' | 'user' | 'artist';
 
     // Check pathname first for immediate determination
     if (pathname?.startsWith('/admin')) return 'admin';
+    if (pathname?.startsWith('/artist')) return 'artist';
 
     // Fallback to user role
     const userRole = user?.role?.toLowerCase();
-    return userRole === 'admin' ? 'admin' : 'user';
+    if (userRole === 'admin') return 'admin';
+    if (userRole === 'artist') return 'artist';
+    return 'user';
   };
 
   const sidebarMode = getSidebarMode();
 
   // Force sidebar to stay expanded in user mode
-  const effectiveCollapsed = sidebarMode === 'user' ? false : collapsed;
+  const effectiveCollapsed = sidebarMode === 'user' || sidebarMode === 'artist' ? false : collapsed;
   
-  // Override setCollapsed for user mode to prevent collapsing
-  const effectiveSetCollapsed = sidebarMode === 'user' ? () => {} : setCollapsed;
+  // Override setCollapsed for user/artist mode to prevent collapsing
+  const effectiveSetCollapsed = sidebarMode === 'user' || sidebarMode === 'artist' ? () => {} : setCollapsed;
 
   // Define sections for each role
   const roleSections: Record<string, {
@@ -79,9 +90,18 @@ export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user,
       header: <UserHeaderSection collapsed={effectiveCollapsed} setCollapsed={effectiveSetCollapsed} allowCollapse={false} />,
       profile: <ProfileSection user={user} collapsed={effectiveCollapsed} />,
       main: <MainNavSection />,
-      playlists: <PlaylistsSection />,
+      playlists: <PlaylistsSection onCreatePlaylist={onCreatePlaylist} />,
+      settings: <SettingsSection onLogout={onLogout} />,
+    }
+    ,
+    artist: {
+      header: <ArtistHeaderSection collapsed={effectiveCollapsed} setCollapsed={effectiveSetCollapsed} allowCollapse={false} />,
+      profile: <ProfileSection user={user} collapsed={effectiveCollapsed} />,
+      main: <ArtistMainNavSection />,
+      playlists: <ArtistSongsSection onCreateSong={onCreateSong} />,
       settings: <SettingsSection onLogout={onLogout} />
     }
+    
   };
 
   const sections = roleSections[sidebarMode] || roleSections.user;
@@ -89,8 +109,8 @@ export default function Sidebar({ activeTab = "", setActiveTab = () => {}, user,
   const shouldPadForPlayer = sidebarMode === 'user' && Boolean(currentSong) && isBarVisible;
 
   return (
-    <div className={`fixed left-0 top-0 z-40 h-full bg-card/95 backdrop-blur-xl border-r border-border shadow-2xl ${sidebarMode === 'admin' ? 'transition-all duration-300 ease-in-out' : ''} ${effectiveCollapsed ? 'w-16' : 'w-64'}`}>
-      <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-out ${shouldPadForPlayer ? 'pb-24' : ''}`}>
+    <div className={`${isMobile ? 'fixed' : 'fixed'} left-0 top-0 z-40 ${isMobile ? (shouldPadForPlayer ? 'h-[calc(100vh-6rem)]' : 'h-screen') : 'h-full'} bg-card/95 backdrop-blur-xl border-r border-border shadow-2xl transition-all duration-300 ease-in-out ${effectiveCollapsed && !isMobile ? 'w-16' : 'w-64'} ${isMobile && !mobileSidebarOpen ? '-translate-x-full' : ''}`}>
+      <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ease-out`}>
         <div className="p-4">
           {/* Header Section */}
           {sections.header}

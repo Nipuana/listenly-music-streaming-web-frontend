@@ -52,7 +52,12 @@ export const getPlaylistById = async (id: string) => {
 // Create playlist
 export const createPlaylist = async (playlistData: any) => {
     try {
-        const response = await axios.post(API.PLAYLISTS.CREATE, playlistData);
+        const isFormData = playlistData instanceof FormData;
+        const response = await axios.post(API.PLAYLISTS.CREATE, playlistData, {
+            headers: isFormData ? {
+                'Content-Type': undefined, // Let browser set Content-Type for FormData
+            } : undefined,
+        });
         return response.data;
     } catch (err: any) {
         handleApiError(err, "Failed to create playlist");
@@ -62,7 +67,12 @@ export const createPlaylist = async (playlistData: any) => {
 // Update playlist
 export const updatePlaylist = async (id: string, playlistData: any) => {
     try {
-        const response = await axios.put(API.PLAYLISTS.UPDATE(id), playlistData);
+        const isFormData = playlistData instanceof FormData;
+        const response = await axios.put(API.PLAYLISTS.UPDATE(id), playlistData, {
+            headers: isFormData ? {
+                'Content-Type': undefined, // Let browser set Content-Type for FormData
+            } : undefined,
+        });
         return response.data;
     } catch (err: any) {
         handleApiError(err, "Failed to update playlist");

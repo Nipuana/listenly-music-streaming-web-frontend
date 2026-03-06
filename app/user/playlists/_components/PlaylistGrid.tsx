@@ -1,33 +1,74 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useMyPlaylists, refetchMyPlaylists } from "@/hooks/cashing-hooks/use-my-playlists";
+import { useMyPlaylists, removeFromMyPlaylistsCache } from "@/hooks/cashing-hooks/use-my-playlists";
+import { refetchAllPlaylists, removeFromAllPlaylistsCache } from "@/hooks/cashing-hooks/use-all-playlists";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CreatePlaylistPopup } from "../../_components/popups/CreatePlaylistPopup";
-import { useState } from "react";
+import { EditPlaylistPopup } from "../../_components/popups/EditPlaylistPopup";
+import { useMemo, useState } from "react";
 import { Plus, Music } from "lucide-react";
 import { PlaylistCard } from "./my_playlist/PlaylistCard";
+import { DeletePlaylistConfirmDialog } from "@/components/ui/delete-playlist-confirm-dialog";
+import { deletePlaylist } from "@/lib/api/api-calls/user_APIs/playlist_APIs/playlists";
+import { toast } from "react-toastify";
 
 export function PlaylistGrid() {
   const { playlists, loading, error, refetch } = useMyPlaylists();
   const [isCreatePopupOpen, setIsCreatePopupOpen] = useState(false);
+  const [editPlaylistId, setEditPlaylistId] = useState<string | null>(null);
+  const [deletePlaylistId, setDeletePlaylistId] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [expanded, setExpanded] = useState(false);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 9;
 
   // Ensure playlists is an array before mapping
   const playlistsArray = Array.isArray(playlists) ? playlists : [];
 
+  const totalItems = playlistsArray.length;
+  const totalPages = useMemo(() => {
+    if (!expanded) return 1;
+    return Math.max(1, Math.ceil(totalItems / itemsPerPage));
+  }, [expanded, totalItems]);
+
+  const displayed = useMemo(() => {
+    if (!expanded) return playlistsArray.slice(0, 3);
+    const start = (page - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return playlistsArray.slice(start, end);
+  }, [expanded, page, playlistsArray]);
+
   const handleEditPlaylist = (playlistId: string) => {
-    // TODO: Implement edit functionality
-    console.log("Edit playlist:", playlistId);
+    setEditPlaylistId(playlistId);
   };
 
   const handleDeletePlaylist = (playlistId: string) => {
-    // TODO: Implement delete functionality
-    console.log("Delete playlist:", playlistId);
+    setDeletePlaylistId(playlistId);
   };
 
-  const handlePlayPlaylist = (playlist: any) => {
-    // TODO: Implement playlist playback
-    console.log("Play playlist:", playlist.id);
+  const confirmDelete = async () => {
+    if (!deletePlaylistId || isDeleting) return;
+    const idToDelete = deletePlaylistId;
+
+    setIsDeleting(true);
+
+    // Optimistic UI update
+    setDeletePlaylistId(null);
+    removeFromMyPlaylistsCache(idToDelete);
+    removeFromAllPlaylistsCache(idToDelete);
+
+    try {
+      await deletePlaylist(idToDelete);
+      toast.success("Playlist deleted");
+      await Promise.all([refetch(), refetchAllPlaylists()]);
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to delete playlist");
+      await Promise.all([refetch(), refetchAllPlaylists()]);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -64,16 +105,57 @@ export function PlaylistGrid() {
               <p className="text-sm text-muted-foreground mt-1">{error}</p>
             </div>
           ) : playlistsArray.length > 0 ? (
-            <div className="grid-responsive-auto">
-              {playlistsArray.map((playlist) => (
+            <>
+              <div className="grid-responsive-auto">
+                {displayed.map((playlist) => (
                 <PlaylistCard
                   key={playlist.id}
                   playlist={playlist}
                   onEdit={handleEditPlaylist}
                   onDelete={handleDeletePlaylist}
+                  allowFavorite={false}
                 />
-              ))}
-            </div>
+                ))}
+              </div>
+
+              {!expanded && totalItems > 3 && (
+                <div className="flex justify-center mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setExpanded(true);
+                      setPage(1);
+                    }}
+                  >
+                    Show more
+                  </Button>
+                </div>
+              )}
+
+              {expanded && totalPages > 1 && (
+                <div className="flex items-center justify-center mt-6 gap-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Prev
+                  </Button>
+                  <span className="text-sm text-muted-foreground">
+                    Page {page} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <Music className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
@@ -91,9 +173,30 @@ export function PlaylistGrid() {
         isOpen={isCreatePopupOpen}
         onClose={() => setIsCreatePopupOpen(false)}
         onSuccess={() => {
-          refetch(); // Refetch in the current component
-          refetchMyPlaylists(); // Also refetch globally for sidebar
+          void refetch();
+          void refetchAllPlaylists();
         }}
+      />
+
+      <EditPlaylistPopup
+        isOpen={!!editPlaylistId}
+        playlistId={editPlaylistId}
+        onClose={() => setEditPlaylistId(null)}
+        onSuccess={() => {
+          void refetch();
+          void refetchAllPlaylists();
+        }}
+      />
+
+      <DeletePlaylistConfirmDialog
+        isOpen={!!deletePlaylistId}
+        playlistName={playlistsArray.find((p: any) => p.id === deletePlaylistId)?.name}
+        onClose={() => {
+          if (isDeleting) return;
+          setDeletePlaylistId(null);
+        }}
+        onConfirm={confirmDelete}
+        isConfirming={isDeleting}
       />
     </>
   );

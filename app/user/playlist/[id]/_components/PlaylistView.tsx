@@ -9,23 +9,34 @@ import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip
 import { Song } from "@/app/user/liked/utils/handlers";
 import { usePlayQueue } from "@/hooks/player-hooks/use-play-queue";
 import { usePlayer } from "@/Providers/Contexts/player-context";
-import { useSongLikeStatus } from "@/hooks/cashing-hooks/use-song-like-status";
 import { Button } from "@/components/ui/button";
-import { Play, Plus, Music, Heart, HeartOff, Share2, MoreHorizontal, Clock, Pause } from "lucide-react";
+import { Play, Plus, Music, Star, StarOff, Share2, MoreHorizontal, Clock, Pause, Edit } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { usePlaylistFavoriteStatus } from "@/hooks/cashing-hooks/use-playlist-favorite-status";
+import { useAuth } from "@/Providers/Contexts/auth-context";
+import { isPlaylistOwnedByUser } from "@/lib/utils/playlist-ownership";
 import { AddSongPopup } from "./AddSongPopup";
 import { RecommendedSection } from "./recommended/RecommendedSection";
 import { SongDetailsPopup } from "@/app/user/_components/popups/SongDetailsPopup";
 import { getSongById } from "@/lib/api/api-calls/user_APIs/song_APIs/songs";
-// playlist UI is static currently; API hooks removed
+import { EditPlaylistPopup } from "@/app/user/_components/popups/EditPlaylistPopup";
+import { DeletePlaylistConfirmDialog } from "@/components/ui/delete-playlist-confirm-dialog";
+import { deletePlaylist, getPlaylistById } from "@/lib/api/api-calls/user_APIs/playlist_APIs/playlists";
+import { PlaylistSongRow } from "./PlaylistSongRow";
+
 
 interface Playlist {
   id: string;
+  _id?: string;
   name: string;
   coverUrl?: string;
-  coverImageUrl?: string; // backend sometimes uses this field
+  coverImageUrl?: string;
   songs?: Song[];
   description?: string;
   isPublic?: boolean;
+  isPrivate?: boolean;
+  visibility?: string;
   creator?: string;
   duration?: string;
   followersCount?: number;
@@ -40,6 +51,7 @@ interface PlaylistViewProps {
 export default function PlaylistView({ playlist, showHeader = true }: PlaylistViewProps) {
   const [localPlaylist, setLocalPlaylist] = useState<Playlist>(playlist);
   const [songs, setSongs] = useState<Song[]>(playlist.songs || []);
+  const { user } = useAuth();
 
   // update when parent hands us a new playlist (eg. paging)
   useEffect(() => {
@@ -48,8 +60,33 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
   }, [playlist]);
 
  
-  const rawCover =  localPlaylist.coverImageUrl || "";
+  const rawCover =
+    localPlaylist.coverImageUrl ||
+    localPlaylist.coverUrl ||
+    (localPlaylist as any).coverImage ||
+    (localPlaylist as any).coverImagePath ||
+    "";
   const coverUrl = rawCover ? getPlaylistCoverUrl(rawCover) : "";
+
+  const isPublicPlaylist = useMemo(() => {
+    const p: any = localPlaylist;
+
+    if (typeof p?.isPublic === "boolean") return p.isPublic;
+    if (typeof p?.isPrivate === "boolean") return !p.isPrivate;
+    if (typeof p?.private === "boolean") return !p.private;
+    if (typeof p?.public === "boolean") return p.public;
+
+    if (typeof p?.isPublic === "string") {
+      const v = p.isPublic.toLowerCase();
+      if (v === "true") return true;
+      if (v === "false") return false;
+    }
+
+    const visibility = (p?.visibility || p?.privacy || p?.access || "").toString().toLowerCase();
+    if (visibility) return visibility === "public";
+
+    return false;
+  }, [localPlaylist]);
 
   const { playAll, playAtIndex } = usePlayQueue(songs);
 
@@ -67,6 +104,14 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
     return songs.findIndex((s) => (s.id || (s as any)._id) === currentSong.id);
   }, [songs, currentSong]);
   const isPlayingPlaylist = isPlaying && currentIndex >= 0;
+
+  const safePlaylistId = (playlist as any)?.id || (playlist as any)?._id || "";
+  const { isFavorited, loading: favLoading, toggleFavoriteStatus } = usePlaylistFavoriteStatus(safePlaylistId);
+  const isOwned = useMemo(() => isPlaylistOwnedByUser(localPlaylist, user), [localPlaylist, user]);
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
   const handleSongDetailsOpen = async (song: Song | string) => {
     let songId = typeof song === 'string' ? song : song.id || (song as any)._id || '';
@@ -93,105 +138,6 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
   };
 
 
-  // row component so hooks remain in order
-  const SongRow = ({ song, idx }: { song: Song; idx: number }) => {
-    const sid = song.id || (song as any)._id || '';
-    const isUnavailable = !sid || !song?.audioUrl;
-    const playableIndex = songs.findIndex((s) => (s.id || (s as any)._id) === sid);
-    const isCurrentSong = currentSong && currentSong.id === sid;
-    const isCurrentPlaying = isCurrentSong && isPlaying;
-
-    // local copy that may get enriched with full details
-    const [detail, setDetail] = useState<Song>(song);
-    useEffect(() => {
-      if (sid && (!detail.uploadedBy && !detail.artist)) {
-        getSongById(sid)
-          .then((resp: any) => {
-            const fetched = resp && typeof resp === 'object' ? resp.data || resp.song || resp : resp;
-            if (fetched) setDetail({ ...detail, ...fetched });
-          })
-          .catch(() => {});
-      }
-    }, [sid, detail]);
-
-    const { isLiked, toggleLikeStatus, loading: likeLoading } = useSongLikeStatus(sid);
-
-    return (
-      <tr
-        key={sid || idx}
-        onClick={(e) => {
-          if ((e.target as HTMLElement).closest('button')) return;
-          handleSongDetailsOpen(detail);
-        }}
-        className={`group border-t border-border transition-colors cursor-pointer ${
-          isUnavailable ? 'bg-background/30 text-foreground-muted' : 'hover:bg-background'
-        }`}
-      >
-        <td className="py-4 pl-4 align-middle text-foreground-secondary">{idx + 1}</td>
-        <td className="py-4 align-middle">
-          <div className="flex items-center gap-4">
-            <Image
-              src={getSongCoverUrl(song.coverImageUrl)}
-              alt={song.title || 'cover'}
-              width={48}
-              height={48}
-              unoptimized={true}
-              className={`w-12 h-12 rounded-md object-cover shadow-sm ${isUnavailable ? 'opacity-50 grayscale' : ''}`}
-            />
-            <div className="min-w-0">
-              <div className="font-semibold text-foreground truncate">{song.title || 'Unavailable'}</div>
-            </div>
-          </div>
-        </td>
-        <td className="py-4 align-middle pr-6 text-right text-foreground-muted">{formatDuration(parseInt(song.duration) || 0)}</td>
-        <td className="py-4 pr-6 text-right">
-          <div className="flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isUnavailable) return;
-                    if (isCurrentSong) {
-                      togglePlay();
-                    } else {
-                      playAtIndex(playableIndex);
-                    }
-                  }}
-                  disabled={isUnavailable}
-                  className="rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-                  aria-label={isCurrentPlaying ? 'Pause' : 'Play'}
-                >
-                  {isCurrentPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top">{isCurrentPlaying ? 'Pause' : 'Play'}</TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!sid) return;
-                    toggleLikeStatus();
-                  }}
-                  disabled={isUnavailable || likeLoading}
-                  className="rounded-md border border-border px-2.5 py-1 text-xs text-foreground hover:bg-background-secondary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
-                  aria-label={isLiked ? 'Unlike' : 'Like'}
-                >
-                  {isLiked ? <HeartOff className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-                </button>
-              </TooltipTrigger>
-              <TooltipContent side="top">{isLiked ? 'Unlike' : 'Like'}</TooltipContent>
-            </Tooltip>
-          </div>
-        </td>
-      </tr>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* gradient header */}
@@ -214,7 +160,7 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="text-xs uppercase bg-white/20 px-2 py-1 rounded-full">
-                    {localPlaylist.isPublic ? 'Public Playlist' : 'Private'}
+                    {isPublicPlaylist ? 'Public Playlist' : 'Private'}
                   </span>
                 </div>
                 <h1 className="text-5xl font-bold leading-tight truncate">
@@ -257,15 +203,43 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
                   Add Songs
                 </Button>
                 {/* placeholder icons for save/share/more */}
-                <Button variant="outline" className="text-white">
-                  <Heart className="w-4 h-4" /> Save
-                </Button>
-                <Button variant="outline" className="text-white">
-                  <Share2 className="w-4 h-4" /> Share
-                </Button>
-                <Button variant="outline" className="text-white">
-                  <MoreHorizontal className="w-4 h-4" />
-                </Button>
+                {!isOwned && (
+                  <Button
+                    variant="outline"
+                    className="text-white"
+                    onClick={() => toggleFavoriteStatus()}
+                    disabled={favLoading || !safePlaylistId}
+                  >
+                    {isFavorited ? (
+                      <StarOff className="w-4 h-4 text-yellow-400" />
+                    ) : (
+                      <Star className="w-4 h-4 text-yellow-400" />
+                    )}
+                    {isFavorited ? "Unfavorite" : "Favorite"}
+                  </Button>
+                )}
+
+                {isOwned ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      className="text-white"
+                      onClick={() => setEditOpen(true)}
+                    >
+                      <Edit className="w-4 h-4" /> Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      className="text-white"
+                      onClick={() => setDeleteOpen(true)}
+                    >
+                      Delete
+                    </Button>
+                  </>
+                ) : (
+                  // not owned: hide share/edit buttons (keep favorite)
+                  null
+                )}
               </div>
             </div>
           </div>
@@ -281,14 +255,32 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
                 <tr className="text-foreground-muted text-sm">
                   <th className="w-12 py-4 pl-4">#</th>
                   <th className="py-4">Title</th>
-                  <th className="w-28 py-4 pr-6 text-right"><Clock className="inline w-4 h-4 mr-1 align-middle" /></th>
+                  <th className="py-4">Artist</th>
+                  <th className="py-4">Date Added</th>
+                  <th className="w-24 py-4 pr-6 text-right"><Clock className="inline w-4 h-4 mr-1 align-middle" /></th>
                   <th className="w-28 py-4 pr-6 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {songs.map((song, idx) => (
-                  <SongRow key={song.id || (song as any)._id || idx} song={song} idx={idx} />
-                ))}
+                {songs.map((song, idx) => {
+                  const songId = song.id || (song as any)._id || "";
+                  const isUnavailable = !songId || !song?.audioUrl;
+                  const playableIndex = songs.findIndex((s) => (s.id || (s as any)._id) === songId);
+
+                  return (
+                    <PlaylistSongRow
+                      key={songId || idx}
+                      song={song}
+                      idx={idx}
+                      isUnavailable={isUnavailable}
+                      onPlay={() => {
+                        if (isUnavailable) return;
+                        if (playableIndex >= 0) playAtIndex(playableIndex);
+                      }}
+                      onRowClick={() => handleSongDetailsOpen(song)}
+                    />
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -313,8 +305,47 @@ export default function PlaylistView({ playlist, showHeader = true }: PlaylistVi
           isOpen={addOpen}
           onClose={() => setAddOpen(false)}
           playlistId={playlist.id}
+          playlistName={playlist.name}
           existingSongIds={songs.map(s => s.id || (s as any)._id || "")}
           onAdd={(song) => setSongs((prev) => [...prev, song])}
+        />
+        <EditPlaylistPopup
+          isOpen={editOpen}
+          playlistId={safePlaylistId || null}
+          onClose={() => setEditOpen(false)}
+          onSuccess={async () => {
+            try {
+              const resp: any = await getPlaylistById(safePlaylistId);
+              const refreshed = resp && typeof resp === "object" ? resp.data || resp.playlist || resp : resp;
+              if (refreshed) {
+                setLocalPlaylist(refreshed);
+                setSongs(refreshed.songs || []);
+              }
+            } catch (e) {
+              // ignore
+            }
+          }}
+        />
+
+        <DeletePlaylistConfirmDialog
+          isOpen={deleteOpen}
+          playlistName={playlist.name}
+          onClose={() => setDeleteOpen(false)}
+          onConfirm={async () => {
+            if (!safePlaylistId) return;
+            setIsDeleting(true);
+            try {
+              await deletePlaylist(safePlaylistId);
+              toast.success("Playlist deleted");
+              router.push("/user/playlists");
+            } catch (e: any) {
+              toast.error(e?.message || "Failed to delete playlist");
+            } finally {
+              setIsDeleting(false);
+              setDeleteOpen(false);
+            }
+          }}
+          isConfirming={isDeleting}
         />
       </div>
     </div>

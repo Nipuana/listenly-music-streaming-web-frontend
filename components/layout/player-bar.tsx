@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { ChevronUp, Pause, Play, SkipBack, SkipForward, Shuffle, Repeat } from "lucide-react";
+import { ChevronUp, Pause, Play, SkipBack, SkipForward, Shuffle, Repeat, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -28,6 +28,7 @@ export function PlayerBar() {
     repeatMode,
     currentTime,
     duration,
+    volume,
     togglePlay,
     setBarVisible,
     playNext,
@@ -35,10 +36,12 @@ export function PlayerBar() {
     seekTo,
     toggleShuffle,
     cycleRepeatMode,
+    setVolume,
   } = usePlayer();
 
   const repeatLabel = useMemo(() => {
     if (repeatMode === "one") return "Repeat one";
+    if (repeatMode === "all") return "Repeat all";
     return "Repeat off";
   }, [repeatMode]);
 
@@ -153,6 +156,11 @@ export function PlayerBar() {
                       1
                     </span>
                   )}
+                  {repeatMode === "all" && (
+                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                      A
+                    </span>
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="top">{repeatLabel}</TooltipContent>
@@ -186,6 +194,18 @@ export function PlayerBar() {
             className="flex-1"
           />
           <span className="w-12 text-xs text-foreground-muted">{formatTime(duration)}</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Volume2 className="h-4 w-4 text-foreground-muted" />
+          <Slider
+            value={[volume]}
+            min={0}
+            max={1}
+            step={0.01}
+            onValueChange={(value) => setVolume(value[0] || 0)}
+            className="w-24"
+          />
         </div>
         </div>
       </div>
