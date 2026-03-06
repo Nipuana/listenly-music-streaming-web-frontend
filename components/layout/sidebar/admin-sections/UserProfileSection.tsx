@@ -2,7 +2,7 @@
 
 import React from "react";
 import { LogOut } from "lucide-react";
-import { getFullImageUrl } from "@/lib/utils/image-util";
+import { UserAvatar } from "@/components/ui/user-avatar";
 
 interface UserProfileSectionProps {
   collapsed: boolean;
@@ -11,17 +11,19 @@ interface UserProfileSectionProps {
 }
 
 export default function UserProfileSection({ collapsed, user, onLogout }: UserProfileSectionProps) {
+  const displayName = user?.username || user?.name || user?.fullName || user?.email || "Admin User";
+  const profilePicture = (user as any)?.profilePicture || (user as any)?.profilePicUrl || (user as any)?.avatar || null;
+
   return (
     <div className="mt-auto flex justify-center">
       {collapsed ? (
         <div className="flex flex-col items-center gap-2">
-          {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
-            <img src={getFullImageUrl(user.profilePicture) || ""} alt="User Avatar" className="w-10 h-10 rounded-full object-cover" />
-          ) : (
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-sm">
-              {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}
-            </div>
-          )}
+          <UserAvatar
+            name={displayName}
+            profilePicture={profilePicture}
+            size="lg"
+            fallbackClassName="bg-secondary text-secondary-foreground font-bold"
+          />
           {onLogout && (
             <button onClick={onLogout} className="p-2 rounded-full hover:bg-accent transition-colors" title="Logout">
               <LogOut className="w-5 h-5 text-muted-foreground" />
@@ -30,15 +32,15 @@ export default function UserProfileSection({ collapsed, user, onLogout }: UserPr
         </div>
       ) : (
         <div className="flex items-center p-3 rounded-2xl border border-border bg-card/70 shadow-sm w-full max-w-xs relative">
-          {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
-            <img src={getFullImageUrl(user.profilePicture) || ""} alt="User Avatar" className="w-12 h-12 rounded-full object-cover" />
-          ) : (
-            <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center font-bold text-secondary-foreground text-lg">
-              {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'AD'}
-            </div>
-          )}
+          <UserAvatar
+            name={displayName}
+            profilePicture={profilePicture}
+            size="lg"
+            className="size-12"
+            fallbackClassName="bg-secondary text-secondary-foreground font-bold"
+          />
           <div className="flex-1 min-w-0 ml-3">
-            <div className="font-bold text-foreground leading-tight truncate">{user?.username || 'Admin User'}</div>
+            <div className="font-bold text-foreground leading-tight truncate">{displayName}</div>
             <div className="text-xs text-muted-foreground truncate">{user?.role || 'No role available'}</div>
           </div>
           {onLogout && (

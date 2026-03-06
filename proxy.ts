@@ -4,6 +4,7 @@ import { getAuthToken, getUserData } from "./lib/cookies/user-data-cookie";
 const publicPaths = ['/login', '/register', '/forget-password', '/'];
 const adminPrefix = '/admin';
 const userPrefix = '/user';
+const artistPrefix = '/artist';
 
 export async function proxy(req:NextRequest){
     const { pathname } = req.nextUrl;
@@ -30,6 +31,16 @@ export async function proxy(req:NextRequest){
         }
     }
 
+    //Protect /artist routes
+    if (pathname.startsWith(artistPrefix)) {
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', req.url));
+        }
+        if (user.role !== 'artist') {
+            return NextResponse.redirect(new URL('/not-found', req.url));
+        }
+    }
+
     // stop alr  logged in users from accessing public pages
     const isPublic = publicPaths.some((path) => path === "/" ? pathname === "/" : pathname === path);
     if (isPublic && user) {
@@ -39,6 +50,9 @@ export async function proxy(req:NextRequest){
         }
         if(user.role ==='user'){
             return NextResponse.redirect(new URL('/user/dashboard', req.url));
+        }
+        if(user.role ==='artist'){
+            return NextResponse.redirect(new URL('/artist/dashboard', req.url));
         }
         else {
             return NextResponse.redirect(new URL('/not-found', req.url));
@@ -53,6 +67,7 @@ export const config ={
     matcher: [
         "/admin/:path*",
         "/user/:path*",
+        "/artist/:path*",
         "/login",
         "/register",
         "/forget-password",

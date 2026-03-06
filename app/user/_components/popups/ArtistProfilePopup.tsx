@@ -6,6 +6,9 @@ import { X } from "lucide-react";
 import { useArtistInfo } from "@/hooks/artist-hooks/use-artist-info";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { getFullImageUrl } from "@/lib/utils/image-util";
+import { createClientOnlyComponent } from "@/lib/utils/client-only";
+import { AnimatedPopup } from "@/lib/utils/animated-popup";
+import Image from "next/image";
 
 interface ArtistProfilePopupProps {
   userId?: string;
@@ -13,7 +16,8 @@ interface ArtistProfilePopupProps {
   onClose: () => void;
 }
 
-export function ArtistProfilePopup({ userId, isOpen, onClose }: ArtistProfilePopupProps) {
+// Create a client-only version of the popup
+const ArtistProfilePopupClient = ({ userId, isOpen, onClose }: ArtistProfilePopupProps) => {
   const { artist, loading } = useArtistInfo(userId);
   const { name, profilePicSrc, profilePicFallback } = useArtistProfile(userId);
 
@@ -33,30 +37,32 @@ export function ArtistProfilePopup({ userId, isOpen, onClose }: ArtistProfilePop
     return artistAny?.bio || artistAny?.about || artistAny?.description || "";
   }, [artist]);
 
-  if (!userId || !isOpen) return null;
+  if (!userId) return null;
 
   const modalContent = (
-    <div className="fixed inset-0 z-9999 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+    <AnimatedPopup
+      isOpen={isOpen}
+      onClose={onClose}
+      className="relative bg-background rounded-xl shadow-2xl max-w-lg w-full mx-4"
+    >
+      <button
         onClick={onClose}
-      />
-      <div className="relative bg-background rounded-xl shadow-2xl max-w-lg w-full mx-4">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
-          aria-label="Close artist profile"
-        >
-          <X className="w-5 h-5 text-white" />
-        </button>
+        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+        aria-label="Close artist profile"
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
 
-        <div className="p-6">
+      <div className="p-6">
           <div className="flex flex-col items-center text-center">
             <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-2xl font-bold overflow-hidden">
               {profilePicSrc ? (
-                <img
-                  src={getFullImageUrl(profilePicSrc) || undefined}
+                <Image
+                  src={getFullImageUrl(profilePicSrc) || ""}
                   alt={displayName}
+                  width={80}
+                  height={80}
+                  unoptimized={true}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -85,9 +91,11 @@ export function ArtistProfilePopup({ userId, isOpen, onClose }: ArtistProfilePop
             )}
           </div>
         </div>
-      </div>
-    </div>
-  );
+      </AnimatedPopup>
+    );
 
   return createPortal(modalContent, document.body);
-}
+};
+
+// Export the dynamically imported component
+export const ArtistProfilePopup = createClientOnlyComponent(ArtistProfilePopupClient);

@@ -10,7 +10,8 @@ export const useLikedSongsCount = () => {
     const fetchLikedSongsCount = async () => {
       try {
         setLoading(true);
-        const likedSongs = await getLikedSongs();
+        const data = await getLikedSongs();
+        const likedSongs = Array.isArray(data) ? data : data?.data || [];
         setCount(likedSongs.length);
         setError(null);
       } catch (err: any) {

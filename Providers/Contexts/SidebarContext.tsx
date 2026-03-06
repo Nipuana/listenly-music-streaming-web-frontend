@@ -1,16 +1,20 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './auth-context';
 
 interface SidebarContextType {
   collapsed: boolean;
   setCollapsed: (collapsed: boolean) => void;
   isMounted: boolean;
+  mobileSidebarOpen: boolean;
+  setMobileSidebarOpen: (open: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: ReactNode; user?: any }> = ({ children, user }) => {
+  const { user: authUser } = useAuth(); 
   // Initialize from localStorage, default to false if not set
   const [collapsed, setCollapsedState] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
@@ -21,18 +25,20 @@ export const SidebarProvider: React.FC<{ children: ReactNode; user?: any }> = ({
   });
 
   const [isMounted, setIsMounted] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Mark as mounted after hydration
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Force sidebar to be expanded for non-admin users
+  // Force sidebar to be expanded for non-admin users (prop or auth context)
   useEffect(() => {
-    if (user && user.role?.toLowerCase() !== 'admin' && collapsed) {
+    const u = user || authUser;
+    if (u && u.role?.toLowerCase() !== 'admin' && collapsed) {
       setCollapsedState(false);
     }
-  }, [user, collapsed]);
+  }, [user, authUser, collapsed]);
 
   // Update localStorage whenever collapsed state changes
   const setCollapsed = (newCollapsed: boolean) => {
@@ -47,7 +53,7 @@ export const SidebarProvider: React.FC<{ children: ReactNode; user?: any }> = ({
   };
 
   return (
-    <SidebarContext.Provider value={{ collapsed, setCollapsed, isMounted }}>
+    <SidebarContext.Provider value={{ collapsed, setCollapsed, isMounted, mobileSidebarOpen, setMobileSidebarOpen }}>
       {children}
     </SidebarContext.Provider>
   );
@@ -57,7 +63,7 @@ export const useSidebarState = () => {
   const context = useContext(SidebarContext);
   if (!context) {
     // Return default values if not in provider (e.g., during SSR)
-    return { collapsed: false, setCollapsed: () => {}, isMounted: false };
+    return { collapsed: false, setCollapsed: () => {}, isMounted: false, mobileSidebarOpen: false, setMobileSidebarOpen: () => {} };
   }
   return context;
 };

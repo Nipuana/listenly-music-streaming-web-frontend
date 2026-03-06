@@ -18,6 +18,8 @@ export const API = {
     UPDATE_USER: (id: string) => `/api/admin/update-user/${id}`,
     DELETE_USER: (id: string) => `/api/admin/delete-user/${id}`,
     CLEAN_ORPHANED_LIKES: '/api/admin/clean-orphaned-likes',
+    CLEAN_ORPHANED_FAVORITES: '/api/admin/clean-orphaned-favorites',
+    
   },
 
   USER_INFO: {
@@ -28,7 +30,7 @@ export const API = {
 
   SONGS: {
     GET_ALL: '/api/songs/get-all-songs',
-    GET_MY_SONGS: '/api/songs/user/my-songs',
+    GET_MY_SONGS: '/api/songs/my-songs',
     GET_BY_USER: (userId: string) => `/api/songs/getSongByuserId/${userId}`,
     GET_BY_GENRE: (genre: string) => `/api/songs/getSongsBygenre/${genre}`,
     GET_BY_ID: (id: string) => `/api/songs/getSongById/${id}`,
@@ -61,5 +63,31 @@ export const API = {
     GET_FAVORITED: '/api/playlists/user/favorited',
     FAVORITE_STATUS: (id: string) => `/api/playlists/${id}/favorited`,
     TOGGLE_FAVORITE: (id: string) => `/api/playlists/${id}/favorite`,
+  },
+  
+  ARTIST_VERIFICATION: {
+  SUBMIT: '/api/artist-verification/request',
+  MY_LATEST: '/api/artist-verification/my-request',
+},
+
+AD_ARTIST_VERIFICATION: {
+  LIST: (status?: 'pending' | 'approved' | 'declined') =>
+    status
+      ? `/api/admin/artist-verification/requests?status=${status}`
+      : '/api/admin/artist-verification/requests',
+  APPROVE: (id: string) => `/api/admin/artist-verification/requests/${id}/approve`,
+  DECLINE: (id: string) => `/api/admin/artist-verification/requests/${id}/decline`,
+},
+AD_AUDIT_LOGS: {
+  // list with optional query params: { limit, page, adminId, action }
+  LIST: (params?: Record<string, string | number>) =>
+    params && Object.keys(params).length
+      ? `/api/admin/audit-logs?${new URLSearchParams(params as Record<string, string>).toString()}`
+      : '/api/admin/audit-logs',
+
+  GET_BY_ID: (id: string) => `/api/admin/audit-logs/${id}`,
+},
+  AD_STATS: {
+    OVERALL: '/api/admin/stats/overall',
   },
 };

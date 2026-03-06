@@ -22,7 +22,7 @@ function handleApiError(err: any, defaultMessage: string): never {
 // Add user info
 export const addUserInfo = async (userInfoData: any) => {
     try {
-        const response = await axios.post(API.USER_INFO.ADD_INFO, userInfoData);
+        const response = await axios.put(API.USER_INFO.ADD_INFO, userInfoData);
         return response.data;
     } catch (err: any) {
         handleApiError(err, "Failed to add user info");

@@ -37,18 +37,21 @@ export default function LoginForm() {
     try {
       const result = await login(data);
       if (result.success) {
-        // Only save cookies if 'remember me' is checked
-        if (data.remember) {
-          await setAuthToken(result.token);
-          await setUserData(result.data);
-        }
+        // Save auth cookies for this session.
+        // ("Remember me" can be used later to add an expiry/maxAge, but skipping cookies breaks auth on protected routes.)
+        await setAuthToken(result.token);
+        await setUserData(result.data);
         await checkAuth();
         // Check the user's role and navigate accordingly
         if (result.data && result.data.role === "user") {
           router.replace("/user/dashboard");
-        } 
-        if(result.data && result.data.role=="admin") {
+        }
+        if (result.data && result.data.role === "admin") {
           router.replace("/admin/ad-dash");
+        }
+        // If artist, go to the artist area
+        if (result.data && result.data.role === "artist") {
+          router.replace("/artist/dashboard");
         }
       } else {
         throw new Error(result.message || "Login failed due to role issue contact support");

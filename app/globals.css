@@ -242,7 +242,7 @@ img {
 /* Responsive Grid System */
 .grid-responsive-auto {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
 }
 
@@ -254,7 +254,7 @@ img {
 
 @media (min-width: 768px) {
   .grid-responsive-auto {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   }
 }
 

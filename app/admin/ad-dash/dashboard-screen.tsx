@@ -1,15 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import { useAuth } from "@/Providers/Contexts/auth-context";
 import { SidebarProvider, useSidebarState } from "@/Providers/Contexts/SidebarContext";
 import Sidebar from "@/components/layout/sidebar/sidebar";
 import UserManagementSection from "../_components/user_management/UserManagementSection";
+import ArtistVerificationSection from "../_components/artist_management/ArtistVerificationSection";
+import SecurityLogsSection from "../_components/security/SecurityLogsSection";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { Users, Mic2, DollarSign, Search, Bell, TrendingUp, Play } from "lucide-react";
+import { Users, Mic2, Search, Bell, Play, Clock } from "lucide-react";
 import { LogoutConfirmDialog } from "@/components/ui/logout-confirm-dialog";
+import { useAllUserRoleCounts } from "@/hooks/user-hooks/use-all-user-role-counts";
+import { useAdminStreamingTotals } from "@/hooks/stats-hooks/use-admin-streaming-totals";
+import { useAdminOverallStats } from "@/hooks/stats-hooks/use-admin-overall-stats";
 
 
 export default function AdminDashboardScreen() {
@@ -18,6 +23,10 @@ export default function AdminDashboardScreen() {
       <InnerDashboard />
     </SidebarProvider>
   );
+}
+
+function StatsSubtitle({ children }: { children: React.ReactNode }) {
+  return <span className="text-[12px] text-muted-foreground">{children}</span>;
 }
 
 function InnerDashboard() {
@@ -45,25 +54,74 @@ function InnerDashboard() {
           onClose={() => setShowLogoutConfirm(false)}
           onConfirm={confirmLogout}
         />
-        <MainContent activeTab={activeTab} />
+        <MainContent activeTab={activeTab} setActiveTab={setActiveTab} />
       </div>
     </div>
   );
 }
 
-function MainContent({ activeTab }: { activeTab: string }) {
+function MainContent({ activeTab, setActiveTab }: { activeTab: string, setActiveTab?: (t: string) => void }) {
+  const { counts, loading: countsLoading } = useAllUserRoleCounts();
+  const { totals: clientTotals, loading: clientTotalsLoading } = useAdminStreamingTotals();
+  const { totals: adminTotals, loading: adminTotalsLoading, refetch: refetchAdminTotals } = useAdminOverallStats();
+
+  const totals = (adminTotals && (adminTotals.totalStreams || adminTotals.totalStreamingHours || adminTotals.songCount)) ? adminTotals : clientTotals;
+
+  const overviewLoading = countsLoading || adminTotalsLoading || clientTotalsLoading;
+
+  const analytics = useMemo(() => {
+    const safe = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : (typeof v === 'string' ? Number(v) || 0 : 0));
+
+    const totalAccounts = safe(counts.total);
+    const artistsCount = safe(counts.artists);
+    const regularUsersCount = safe(counts.regularUsers);
+
+    const totalStreams = safe(totals.totalStreams);
+    const totalListenTimeSeconds = safe(totals.totalListenTimeSeconds);
+    const songCount = safe(totals.songCount);
+
+    const artistsShare = totalAccounts > 0 ? (artistsCount / totalAccounts) * 100 : 0;
+
+    const streamsPerSong = songCount > 0 ? totalStreams / songCount : 0;
+    const minutesPerStream = totalStreams > 0 ? (totalListenTimeSeconds / totalStreams) / 60 : 0;
+    const streamsPerUser = regularUsersCount > 0 ? totalStreams / regularUsersCount : 0;
+    const streamsPerArtist = artistsCount > 0 ? totalStreams / artistsCount : 0;
+
+    return {
+      artistsShare,
+      streamsPerSong,
+      minutesPerStream,
+      streamsPerUser,
+      streamsPerArtist,
+    };
+  }, [counts, totals]);
+
+  function formatCompactNumber(value: number) {
+    return Intl.NumberFormat("en-US", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(value);
+  }
+
+  function formatNumber(value: number) {
+    return Intl.NumberFormat("en-US").format(Math.round(value));
+  }
+
+  function formatFixed(value: number, digits = 1) {
+    if (!Number.isFinite(value)) return "0";
+    return Intl.NumberFormat("en-US", { maximumFractionDigits: digits }).format(value);
+  }
+
   return (
     <main className="min-h-screen p-6 md:p-8 lg:p-10 xl:p-12">
-      <div className="max-w-7xl mx-20 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 space-y-8">
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h2 className="text-3xl font-bold text-foreground mb-1">
             {activeTab === 'overview' && 'System Overview'}
             {activeTab === 'users' && 'User Management'}
             {activeTab === 'artists' && 'Artist Verification'}
-            {activeTab === 'content' && 'Content Moderation'}
-            {activeTab === 'revenue' && 'Revenue Analytics'}
-            {activeTab === 'feedback' && 'Customer Support'}
+            {activeTab === 'theme' && 'Theme Settings'}
             {activeTab === 'theme' && 'Theme Settings'}
             {activeTab === 'security' && 'Security Audit'}
           </h2>
@@ -80,21 +138,134 @@ function MainContent({ activeTab }: { activeTab: string }) {
       <div>
         {activeTab === 'overview' && (
           <div className="space-y-8">
-            {/* Example stats cards */}
+            {/* Overview stats */}
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              <StatsCard title="Total Revenue" value="$128,430" trend="+14.2%" trendUp={true} icon={<DollarSign className="text-primary-foreground" />} color="bg-primary" />
-              <StatsCard title="Active Users" value="42,560" trend="+8.1%" trendUp={true} icon={<Users className="text-primary-foreground" />} color="bg-secondary" />
-              <StatsCard title="Total Streams" value="1.2M" trend="+24.5%" trendUp={true} icon={<Play className="text-primary-foreground" />} color="bg-accent" />
-              <StatsCard title="New Artists" value="124" trend="-2.4%" trendUp={false} icon={<Mic2 className="text-primary-foreground" />} color="bg-muted" />
+              <StatsCard
+                title="Total Users"
+                value={overviewLoading ? "..." : formatNumber(counts.regularUsers)}
+                icon={<Users className="text-primary-foreground" />}
+                color="bg-secondary"
+              />
+              <StatsCard
+                title="Total Artists"
+                value={overviewLoading ? "..." : formatNumber(counts.artists)}
+                icon={<Mic2 className="text-primary-foreground" />}
+                color="bg-secondary"
+              />
+              <StatsCard
+                title="Total Streams"
+                value={overviewLoading ? "..." : formatCompactNumber(totals.totalStreams)}
+                icon={<Play className="text-foreground" />}
+                color="bg-accent"
+              />
+              <StatsCard
+                title="Streaming Hours"
+                value={overviewLoading ? "..." : formatCompactNumber(totals.totalStreamingHours)}
+                subtitle={overviewLoading ? "..." : <StatsSubtitle>{`${formatFixed(analytics.minutesPerStream, 1)} min/stream`}</StatsSubtitle>}
+                action={(
+                  <Button variant="ghost" size="sm" onClick={() => refetchAdminTotals && refetchAdminTotals()} className="ml-2">
+                    Refresh
+                  </Button>
+                )}
+                icon={<Clock className="text-foreground" />}
+                color="bg-primary/50"
+              />
             </div>
-            {/* Add more dashboard content as needed */}
+
+            {/* Admin controls: big buttons linking to admin sections */}
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+              <Card onClick={() => setActiveTab && setActiveTab('users')} className="cursor-pointer hover:shadow-lg">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center shadow-primary">
+                        <Users className="text-primary-foreground" />
+                      </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">User Management</p>
+                      <p className="text-lg font-bold">Manage users</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card onClick={() => setActiveTab && setActiveTab('artists')} className="cursor-pointer hover:shadow-lg">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center shadow-primary">
+                        <Mic2 className="text-primary-foreground" />
+                      </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Artist Verification</p>
+                      <p className="text-lg font-bold">Review artist requests</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card onClick={() => setActiveTab && setActiveTab('content')} className="cursor-pointer hover:shadow-lg">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center shadow-primary">
+                        <Search className="text-primary-foreground" />
+                      </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Content Library</p>
+                      <p className="text-lg font-bold">Manage songs & playlists</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card onClick={() => setActiveTab && setActiveTab('security')} className="cursor-pointer hover:shadow-lg">
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-primary/50 flex items-center justify-center shadow-primary">
+                        <Bell className="text-primary-foreground" />
+                      </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Security</p>
+                      <p className="text-lg font-bold">Audit logs & alerts</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+            {/* Descriptions to fill the page */}
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mt-6">
+              <Card>
+                <CardContent className="p-6">
+                  <h4 className="text-lg font-semibold">User Management</h4>
+                  <p className="text-sm text-muted-foreground mt-2">View and manage all user accounts, adjust roles and permissions, deactivate or restore accounts, and monitor user activity to keep the platform safe and organized.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h4 className="text-lg font-semibold">Artist Verification</h4>
+                  <p className="text-sm text-muted-foreground mt-2">Review and process artist verification requests, check submitted documents, approve or decline applicants, and communicate verification status to creators.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h4 className="text-lg font-semibold">Content Library</h4>
+                  <p className="text-sm text-muted-foreground mt-2">Manage songs and playlists across the catalog: edit metadata, remove or restore tracks, and curate featured content to ensure high-quality listening experiences.</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardContent className="p-6">
+                  <h4 className="text-lg font-semibold">Security & Audit</h4>
+                  <p className="text-sm text-muted-foreground mt-2">Access audit logs and security alerts, investigate suspicious activity, and export logs for compliance and incident response workflows.</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
         {activeTab === 'users' && <UserManagementSection />}
         {activeTab === 'artists' && (
-          <div className="text-center py-12">
-            <Mic2 className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">Artist Verification section coming soon...</p>
+          <div className="py-2">
+            <ArtistVerificationSection />
           </div>
         )}
         {activeTab === 'content' && (
@@ -103,30 +274,8 @@ function MainContent({ activeTab }: { activeTab: string }) {
             <p className="text-muted-foreground text-lg">Content Library section coming soon...</p>
           </div>
         )}
-        {activeTab === 'revenue' && (
-          <div className="text-center py-12">
-            <DollarSign className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">Revenue & Plans section coming soon...</p>
-          </div>
-        )}
-        {activeTab === 'feedback' && (
-          <div className="text-center py-12">
-            <Bell className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">Support & Feedback section coming soon...</p>
-          </div>
-        )}
-        {activeTab === 'theme' && (
-          <div className="text-center py-12">
-            <Search className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">Theme customization coming soon...</p>
-          </div>
-        )}
-        {activeTab === 'security' && (
-          <div className="text-center py-12">
-            <Users className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground text-lg">Security Logs section coming soon...</p>
-          </div>
-        )}
+        {/* Removed Content, Revenue, and Support/Feedback sections per request */}
+        {activeTab === 'security' && <SecurityLogsSection />}
       </div>
       {/* Add more tab screens here, e.g. Artists, etc. */}
     </div>
@@ -135,13 +284,13 @@ function MainContent({ activeTab }: { activeTab: string }) {
 }
 
 
-function StatsCard({ title, value, trend, trendUp, icon, color }: {
+function StatsCard({ title, value, icon, color, subtitle, action }: {
   title: string,
   value: string,
-  trend: string,
-  trendUp: boolean,
   icon: React.ReactNode,
-  color: string
+  color: string,
+  subtitle?: React.ReactNode,
+  action?: React.ReactNode,
 }) {
   return (
     <Card className="border-border/50 shadow-sm bg-card/80 backdrop-blur-md hover:shadow-primary hover:-translate-y-1 transition-all duration-300">
@@ -150,19 +299,15 @@ function StatsCard({ title, value, trend, trendUp, icon, color }: {
           <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center shadow-primary`}>
             {icon}
           </div>
-          <div className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full ${
-            trendUp ? 'bg-success/10 text-success' : 'bg-destructive/10 text-destructive'
-          }`}>
-            {trendUp ? <TrendingUp size={12} /> : <TrendingUp size={12} className="rotate-180" />}
-            {trend}
+          <div>
+            {action}
           </div>
         </div>
         <div className="space-y-1">
           <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wider">{title}</p>
           <h3 className="text-3xl font-black text-foreground">{value}</h3>
-        </div>
-        <div className="mt-4 pt-4 border-t border-border/50">
-          <Progress value={trendUp ? 75 : 35} className={`h-1.5 ${trendUp ? 'bg-success/20' : 'bg-destructive/20'}`} />
+          {/* optional subtitle */}
+          {subtitle ? <div>{subtitle}</div> : null}
         </div>
       </CardContent>
     </Card>

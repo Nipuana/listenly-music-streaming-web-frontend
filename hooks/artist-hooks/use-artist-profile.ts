@@ -1,4 +1,5 @@
 import { useArtistInfo } from './use-artist-info';
+import { getFullImageUrl } from '@/lib/utils/image-util';
 
 interface UseArtistProfileReturn {
   name: string;
@@ -30,11 +31,12 @@ export const useArtistProfile = (userId?: string): UseArtistProfileReturn => {
   }
 
   const profilePicUrl = artist.profilePicture || artist.profilePicUrl || artist.profile_pic || null;
+  const profilePicSrc = getFullImageUrl(profilePicUrl);
   const name = artist.name || artist.username || 'Unknown Artist';
 
   return {
     name,
-    profilePicSrc: profilePicUrl,
+    profilePicSrc,
     profilePicFallback: getInitials(name),
     loading,
     error

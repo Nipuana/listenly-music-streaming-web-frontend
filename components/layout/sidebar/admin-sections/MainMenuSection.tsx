@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { LayoutDashboard, Users, Mic2, Music, DollarSign, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Users, Mic2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface SidebarItemProps {
@@ -67,9 +67,7 @@ export default function MainMenuSection({ activeTab, setActiveTab, collapsed }: 
       <SidebarItem icon={<LayoutDashboard size={20} />} label="Overview" active={activeTab === "overview"} onClick={() => setActiveTab("overview")} collapsed={collapsed} />
       <SidebarItem icon={<Users size={20} />} label="User Management" active={activeTab === "users"} onClick={() => setActiveTab("users")} collapsed={collapsed} />
       <SidebarItem icon={<Mic2 size={20} />} label="Artist Verification" active={activeTab === "artists"} onClick={() => setActiveTab("artists")} collapsed={collapsed} />
-      <SidebarItem icon={<Music size={20} />} label="Content Library" active={activeTab === "content"} onClick={() => setActiveTab("content")} collapsed={collapsed} />
-      <SidebarItem icon={<DollarSign size={20} />} label="Revenue & Plans" active={activeTab === "revenue"} onClick={() => setActiveTab("revenue")} collapsed={collapsed} />
-      <SidebarItem icon={<MessageSquare size={20} />} label="Support & Feedback" active={activeTab === "feedback"} onClick={() => setActiveTab("feedback")} collapsed={collapsed} />
+      {/* Removed: Content Library, Revenue & Plans, Support & Feedback */}
     </nav>
   );
 }

@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { getFullImageUrl } from "@/lib/utils/image-util";
+import { UserAvatar } from "@/components/ui/user-avatar";
+
 
 interface ProfileSectionProps {
   user?: { name: string; profilePicture?: string; role?: string; username?: string; fullName?: string; email?: string };
@@ -10,44 +11,51 @@ interface ProfileSectionProps {
 }
 
 export default function ProfileSection({ user, collapsed }: ProfileSectionProps) {
+  const displayName = user?.username || user?.name || user?.fullName || user?.email || "User";
+  const profilePicture = (user as any)?.profilePicture || (user as any)?.profilePicUrl || (user as any)?.avatar || null;
+
+  const isArtist = (user as any)?.role === "artist";
+  const profileHref = isArtist ? "/artist/profile" : "/user/profile";
+
+  
+
   if (collapsed) {
     return (
       <div className="flex justify-center mb-4">
-        <Link href="/user/profile" className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-accent transition-colors">
-          {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
-            <img src={getFullImageUrl(user.profilePicture) || ""} alt="Profile" className="w-8 h-8 rounded-full object-cover" />
-          ) : (
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm">
-              {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'U'}
-            </div>
-          )}
-        </Link>
+        <div className="flex flex-col items-center gap-2 p-2 rounded-xl">
+          <UserAvatar
+            name={displayName}
+            profilePicture={profilePicture}
+            size="default"
+            fallbackClassName="bg-primary text-primary-foreground font-bold"
+          />
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mb-4">
-      <Link
-        href="/user/profile"
-        className="flex items-center p-3 rounded-2xl border border-border bg-card/70 shadow-sm hover:bg-accent transition-colors w-full max-w-xs"
-      >
-        {user?.profilePicture && getFullImageUrl(user.profilePicture) ? (
-          <img src={getFullImageUrl(user.profilePicture) || ""} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center font-bold text-primary-foreground text-sm">
-            {user?.name ? user.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'U'}
+      <div className="mb-4">
+        <div className="flex items-center p-3 rounded-2xl border border-border bg-card/70 shadow-sm transition-colors w-full max-w-xs">
+          <div className="p-0">
+            <UserAvatar
+              name={displayName}
+              profilePicture={profilePicture}
+              size="lg"
+              fallbackClassName="bg-primary text-primary-foreground font-bold"
+            />
           </div>
-        )}
-        <div className="flex-1 min-w-0 ml-3">
-          <div className="font-bold text-foreground leading-tight truncate">
-            {user?.username || user?.name || 'User'}
-          </div>
-          <div className="text-xs text-muted-foreground truncate">
-            View Profile
-          </div>
+          <Link
+            href={profileHref}
+            className="flex-1 min-w-0 ml-3"
+          >
+            <div className="font-bold text-foreground leading-tight truncate">{displayName}</div>
+            <div className="text-xs text-muted-foreground truncate">View Profile</div>
+          </Link>
         </div>
-      </Link>
+        
+      </div>
     </div>
   );
 }

@@ -31,3 +31,8 @@ export const clearAuthCookies = async () => {
     cookieStore.delete("auth_token");
     cookieStore.delete("user_data");
 }
+
+export const clearAllCookies = async () => {
+    const cookieStore = await cookies();
+    cookieStore.getAll().forEach((cookie) => cookieStore.delete(cookie.name));
+}

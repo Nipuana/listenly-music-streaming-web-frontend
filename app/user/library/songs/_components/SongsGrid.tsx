@@ -27,7 +27,7 @@ interface SongsGridProps {
 
 export function SongsGrid({ title, songs, onPlaySong }: SongsGridProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
+  const itemsPerPage = 6;
 
   const totalPages = Math.ceil(songs.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -95,7 +95,7 @@ export function SongsGrid({ title, songs, onPlaySong }: SongsGridProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-8">
-        <div className="grid-responsive-auto">
+        <div className="grid-responsive-auto justify-items-center sm:justify-items-start">
           {currentSongs.map((song, index) => (
             <SongCard
               key={song.id}

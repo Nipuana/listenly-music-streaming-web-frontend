@@ -1,9 +1,11 @@
 "use client";
 import { useAuth } from "../../../../Providers/Contexts/auth-context";
-import Sidebar from "../../../../components/layout/sidebar/sidebar";
-import { SidebarProvider, useSidebarState } from "../../../../Providers/Contexts/SidebarContext";
+import { SidebarLayout } from "../../../../components/layout/sidebar/SidebarLayout";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { ProfileHeader } from "./ProfileHeader";
 import { ProfileStats } from "./ProfileStats";
 import { QuickActions } from "./QuickActions";
@@ -12,18 +14,11 @@ import { RecentActivity } from "./RecentActivity";
 
 export function ProfileDashboard() {
   const { user, logout } = useAuth();
-  const { collapsed } = useSidebarState();
 
   return (
-    <SidebarProvider user={user}>
-      <div className="min-h-screen bg-linear-to-br from-background via-background-secondary to-background-tertiary">
-        <Sidebar activeTab="" setActiveTab={() => {}} user={user} onLogout={logout} mode="user" />
-
-        <div style={{ marginLeft: collapsed ? '64px' : '256px' }} className="transition-all duration-300 ease-in-out">
-          <MainContent user={user} />
-        </div>
-      </div>
-    </SidebarProvider>
+    <SidebarLayout mode="user" onLogout={logout} user={user}>
+      <MainContent user={user} />
+    </SidebarLayout>
   );
 }
 
@@ -54,6 +49,23 @@ function MainContent({ user }: { user: any }) {
 
         {/* Recent Activity Section */}
         <RecentActivity />
+
+        <Separator className="my-8" />
+
+        {/* Artist Verification Section */}
+        <Card className="bg-card/60 backdrop-blur-md border-border/50 shadow-lg">
+          <CardHeader>
+            <CardTitle>Register as an Artist</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Want to upload and manage your tracks officially? Start the artist verification process.
+            </p>
+            <Button asChild>
+              <Link href="/user/verification-request">Start verification</Link>
+            </Button>
+          </CardContent>
+        </Card>
 
       </div>
     </main>

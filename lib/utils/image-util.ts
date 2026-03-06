@@ -13,7 +13,9 @@ export function getFullImageUrl(imagePath: string | null): string | null {
   
   // Otherwise, prepend the API base URL
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-  return `${baseUrl}${imagePath}`;
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  return `${normalizedBase}${normalizedPath}`;
 }
 
 /**
@@ -29,5 +31,7 @@ export function getFullMediaUrl(mediaPath: string | null): string | null {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000';
-  return `${baseUrl}${mediaPath}`;
+  const normalizedBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+  const normalizedPath = mediaPath.startsWith('/') ? mediaPath : `/${mediaPath}`;
+  return `${normalizedBase}${normalizedPath}`;
 }

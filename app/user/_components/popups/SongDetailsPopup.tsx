@@ -6,10 +6,13 @@ import { Play, Pause, Calendar, User, Clock, X } from "lucide-react";
 import { getSongCoverUrl } from "@/hooks/media-hooks/get-song-cover";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { usePlayer } from "@/Providers/Contexts/player-context";
-import { formatDuration, formatRelativeTime } from "../../liked/utils/utils";
+import { formatDuration, formatRelativeTime } from "../../liked/utils/formatting-utils";
 import { getFullImageUrl } from "@/lib/utils/image-util";
 import { ArtistProfilePopup } from "./ArtistProfilePopup";
 import { Slider } from "@/components/ui/slider";
+import { createClientOnlyComponent } from "@/lib/utils/client-only";
+import { AnimatedPopup } from "@/lib/utils/animated-popup";
+import Image from "next/image";
 
 interface Song {
   id: string;
@@ -31,7 +34,8 @@ interface SongDetailsPopupProps {
   onPlay: () => void;
 }
 
-export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsPopupProps) {
+// Create a client-only version of the popup
+const SongDetailsPopupClient = ({ song, isOpen, onClose, onPlay }: SongDetailsPopupProps) => {
   const { isPlaying, currentSong, togglePlay, currentTime, duration, seekTo } = usePlayer();
   const [isArtistPopupOpen, setIsArtistPopupOpen] = useState(false);
 
@@ -42,7 +46,19 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  // Extract user ID from uploadedBy field
+  // helper values derived from song
+  const songId = useMemo(() => {
+    if (!song) return '';
+    return song.id || (song as any)._id || '';
+  }, [song]);
+
+  const durationMs = useMemo(() => {
+    if (!song?.duration) return 0;
+    const v = parseInt(song.duration);
+    return Number.isNaN(v) ? 0 : v;
+  }, [song]);
+
+  // Extract user ID from uploadedBy field (same logic used elsewhere)
   const userId = useMemo(() => {
     if (!song) return '';
     if (typeof song.uploadedBy === 'object' && song.uploadedBy !== null) {
@@ -58,9 +74,9 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
     if (typeof song?.uploadedBy === "string") return song.uploadedBy;
     if (song?.uploadedBy && typeof song.uploadedBy === "object") {
       const u = song.uploadedBy as any;
-      return u.username || u.name || u._id || u.id || song.artist || "—";
+      return u.username || u.name || u._id || u.id || song.artist || "Unknown Artist";
     }
-    return song?.artist || "—";
+    return song?.artist || "Unknown Artist";
   }, [artistLoading, artistName, song]);
 
   const isCurrentSong = Boolean(currentSong && currentSong.id === song?.id);
@@ -77,32 +93,23 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
   if (!song) return null;
 
   const modalContent = (
-    <>
-      {isOpen && (
-        <div className="fixed inset-0 z-9999 flex items-center justify-center">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClose();
-            }}
-          />
+    <AnimatedPopup
+      isOpen={isOpen}
+      onClose={onClose}
+      className="relative bg-background rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto"
+    >
+      {/* Close Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onClose();
+        }}
+        className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
+      >
+        <X className="w-5 h-5 text-white" />
+      </button>
 
-          {/* Modal Content */}
-          <div className="relative bg-background rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            {/* Close Button */}
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-black/20 hover:bg-black/40 transition-colors"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-
-            <div className="p-6">
+      <div className="p-6">
               {/* Title */}
               <div className="text-center mb-6">
                 <h2 className="text-2xl font-bold text-foreground">
@@ -112,10 +119,13 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
 
               {/* Large Cover Image */}
               <div className="flex justify-center mb-6">
-                <img
+                <Image
                   src={getSongCoverUrl(song.coverImageUrl)}
                   alt={song.title || 'Song cover'}
-                  className="w-80 h-80 rounded-xl shadow-2xl object-cover"
+                  width={320}
+                  height={320}
+                  unoptimized={true}
+                  className="w-64 h-64 sm:w-72 sm:h-72 md:w-80 md:h-80 rounded-xl shadow-2xl object-cover"
                 />
               </div>
 
@@ -146,14 +156,14 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
                 <Slider
                   value={[isCurrentSong ? Math.min(currentTime, duration || 0) : 0]}
                   min={0}
-                  max={isCurrentSong ? (duration || 0) : (song?.duration ? parseInt(song.duration) : 0)}
+                  max={isCurrentSong ? (duration || 0) : durationMs}
                   step={1}
                   onValueChange={isCurrentSong ? ((value) => seekTo(value[0] || 0)) : undefined}
                   disabled={!isCurrentSong}
                   className="flex-1"
                 />
                 <span className="w-12 text-xs text-foreground-muted">
-                  {isCurrentSong ? formatTime(duration) : formatTime(song?.duration ? parseInt(song.duration) : 0)}
+                  {isCurrentSong ? formatTime(duration) : formatTime(durationMs)}
                 </span>
               </div>
 
@@ -212,19 +222,15 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
                     <div>
                       <p className="text-xs text-muted-foreground">Duration</p>
                       <p className="text-sm font-medium">
-                        {formatDuration(parseInt(song.duration) || 0)}
+                        {formatDuration(durationMs)}
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </>
-  );
-
+      </AnimatedPopup>
+    );
   return (
     <>
       {createPortal(modalContent, document.body)}
@@ -235,4 +241,7 @@ export function SongDetailsPopup({ song, isOpen, onClose, onPlay }: SongDetailsP
       />
     </>
   );
-}
+};
+
+// Export the dynamically imported component
+export const SongDetailsPopup = createClientOnlyComponent(SongDetailsPopupClient);

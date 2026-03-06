@@ -3,19 +3,24 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { ChangePasswordPopup } from "@/app/user/_components/popups/ChangePasswordPopup";
 
 interface AccountDetailsProps {
   user: any;
 }
 
 export function AccountDetails({ user }: AccountDetailsProps) {
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.3 }}
     >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <ChangePasswordPopup isOpen={changePasswordOpen} onClose={() => setChangePasswordOpen(false)} />
+      <div className="grid grid-cols-1 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Account Details</CardTitle>
@@ -34,7 +39,11 @@ export function AccountDetails({ user }: AccountDetailsProps) {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Account Type</span>
-              <Badge variant="secondary">Premium</Badge>
+              {user?.role === "pUser" ? (
+                <Badge variant="secondary">Premium</Badge>
+              ) : (
+                <Badge variant="outline">Standard</Badge>
+              )}
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">Member Since</span>
@@ -42,30 +51,8 @@ export function AccountDetails({ user }: AccountDetailsProps) {
                 {new Date(user?.createdAt || Date.now()).toLocaleDateString()}
               </span>
             </div>
-          </CardContent>
-        </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Privacy & Security</CardTitle>
-            <CardDescription>
-              Manage your privacy settings
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Profile Visibility</span>
-              <Badge variant="outline">Public</Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Activity Status</span>
-              <Badge variant="outline">Visible</Badge>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Data Sharing</span>
-              <Badge variant="outline">Limited</Badge>
-            </div>
-            <Button variant="outline" className="w-full mt-4">
+            <Button variant="outline" className="w-full mt-4" onClick={() => setChangePasswordOpen(true)}>
               Change Password
             </Button>
           </CardContent>
