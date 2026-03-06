@@ -1,18 +1,19 @@
-import { Heart, Music, Clock, User } from "lucide-react";
+import { Heart, Music } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { useUserStats } from "@/hooks/stats-hooks/use-user-stats";
+import { useLikedSongsCount } from "@/hooks/stats-hooks/use-liked-songs-count";
+import { useFavoritedPlaylistsCount } from "@/hooks/stats-hooks/use-favorited-playlists-count";
 
 export function StatsGrid() {
-  const { stats } = useUserStats();
+  const { count: likedCount = 0, loading: likedLoading } = useLikedSongsCount();
+  const { count: favoritedCount = 0, loading: favoritedLoading } = useFavoritedPlaylistsCount();
+  const loading = likedLoading || favoritedLoading;
 
   const statsData = [
-    { title: "Liked Songs", value: stats.likedSongs, icon: Heart, color: "text-secondary" },
-    { title: "Playlists", value: stats.playlists, icon: Music, color: "text-primary" },
-    { title: "Hours Listened", value: stats.hoursListened, icon: Clock, color: "text-secondary" },
-    { title: "Following", value: 56, icon: User, color: "text-primary" }, // TODO: Implement following count
+    { title: "Liked Songs", value: loading ? "—" : likedCount.toLocaleString(), icon: Heart },
+    { title: "Favorited Playlists", value: loading ? "—" : favoritedCount.toLocaleString(), icon: Music },
   ];
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 space-responsive">
+    <div className="grid grid-cols-1 sm:grid-cols-2 space-responsive">
       {statsData.map((stat) => {
         const Icon = stat.icon;
         return (
