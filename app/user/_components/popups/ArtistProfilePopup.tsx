@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
-import { useArtistInfo } from "@/hooks/cashing-hooks/use-artist-info";
+import { useArtistInfo } from "@/hooks/artist-hooks/use-artist-info";
 import { useArtistProfile } from "@/hooks/artist-hooks/use-artist-profile";
 import { getFullImageUrl } from "@/lib/utils/image-util";
 import { createClientOnlyComponent } from "@/lib/utils/client-only";

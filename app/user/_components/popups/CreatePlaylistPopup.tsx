@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { createPlaylistSchema, CreatePlaylistFormValues } from "../../utils/createPlaylistSchema";
 import { createPlaylist } from "@/lib/api/api-calls/user_APIs/playlist_APIs/playlists";
+import { refetchMyPlaylists } from "@/hooks/cashing-hooks/use-my-playlists";
+import { refetchAllPlaylists } from "@/hooks/cashing-hooks/use-all-playlists";
 import { toast } from "react-toastify";
 import { createClientOnlyComponent } from "@/lib/utils/client-only";
 import { AnimatedPopup } from "@/lib/utils/animated-popup";
@@ -64,8 +66,10 @@ const CreatePlaylistPopupClient = ({ isOpen, onClose, onSuccess }: CreatePlaylis
       }
 
       await createPlaylist(formData);
-
       toast.success("Playlist created successfully!");
+      // Refresh cached playlists so sidebar updates immediately
+      void refetchMyPlaylists().catch(() => {});
+      void refetchAllPlaylists().catch(() => {});
       reset();
       setCoverImage(null);
       setCoverPreview(null);
